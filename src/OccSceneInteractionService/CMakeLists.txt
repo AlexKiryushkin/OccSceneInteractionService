@@ -21,6 +21,7 @@ add_library(${LIBRARY_NAME})
 # -------------------------------------------------------------------------------------------------
 target_sources(${LIBRARY_NAME} 
     PRIVATE
+        ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/ICameraListener.h
         ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/UiRenderSyncObject.h
         ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/ViewController.h)
 
