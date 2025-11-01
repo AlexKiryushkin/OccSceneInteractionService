@@ -40,11 +40,12 @@ jobs:
         with:
           vcpkgGitCommitId: '74e6536215718009aae747d86d84b78376bf9e09'
 
-      - name: Install OpenCascade (manual mode)
-        run: vcpkg install opencascade
+      - name: Install MacOS vcpkg OCC deps
+        if: runner.os == 'macOS'
+        run:  brew install autoconf autoconf-archive automake libtool
 
       - name: Install OpenCascade (manual mode)
-        run: ./vcpkg/vcpkg install opencascade
+        run: vcpkg install opencascade
 
       - name: Integrate vcpkg
         run: ./vcpkg/vcpkg integrate install
@@ -56,7 +57,7 @@ jobs:
           cmake 
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
           -DOSIS_BUILD_TESTS:BOOL=ON
-          -DDCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake ../
+          -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake ../
 
       - name: Build
         working-directory: build
