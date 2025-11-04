@@ -61,6 +61,7 @@ class ViewController : public AIS_ViewController
 
   private:
     UiRenderSyncObject<Handle(ICameraListener)> m_pCameraListenerSyncObject;
+    bool m_isAnimationInProgress = false;
 };
 
 } // namespace osis

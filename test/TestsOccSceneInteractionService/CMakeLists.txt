@@ -21,13 +21,24 @@ add_executable(${TEST_EXECUTABLE_NAME})
 # -------------------------------------------------------------------------------------------------
 target_sources(${TEST_EXECUTABLE_NAME} 
     PRIVATE
-        ${CMAKE_CURRENT_LIST_DIR}/src/main.cpp)
+        ${CMAKE_CURRENT_LIST_DIR}/include/TestsOccSceneInteractionService/TestViewControllerBase.h)
+
+target_sources(${TEST_EXECUTABLE_NAME} 
+    PRIVATE
+        ${CMAKE_CURRENT_LIST_DIR}/src/main.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/TestUiRenderSyncObject.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/TestViewControllerBase.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/TestViewControllerMouseZoom.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/TestViewControllerPan.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/TestViewControllerRotation.cpp)
 
 
 # -------------------------------------------------------------------------------------------------
 # Find Packages
 # -------------------------------------------------------------------------------------------------
+find_package(GTest CONFIG REQUIRED)
 find_package(OpenCASCADE REQUIRED COMPONENTS ${OpenCASCADE_Visualization_LIBRARIES})
+include(GoogleTest)
 
 
 # -------------------------------------------------------------------------------------------------
@@ -36,8 +47,10 @@ find_package(OpenCASCADE REQUIRED COMPONENTS ${OpenCASCADE_Visualization_LIBRARI
 target_link_libraries(
     ${TEST_EXECUTABLE_NAME}
         PRIVATE
+            osis::OccSceneInteractionService
             GTest::gtest_main
-            ${OpenCASCADE_Visualization_LIBRARIES}
+            GTest::gmock_main
+            TKOpenGl
 )
 
 
@@ -47,9 +60,18 @@ target_link_libraries(
 target_include_directories(
     ${TEST_EXECUTABLE_NAME}
         PRIVATE
+            ${CMAKE_CURRENT_LIST_DIR}/include
             ${CMAKE_SOURCE_DIR}/src/OccSceneInteractionService/include
-            ${OpenCASCADE_INCLUDE_DIR}
 )
+
+
+# -------------------------------------------------------------------------------------------------
+# Compile definitions
+# -------------------------------------------------------------------------------------------------
+target_compile_definitions(
+    ${TEST_EXECUTABLE_NAME} PUBLIC
+        GTEST_LINKED_AS_SHARED_LIBRARY
+    )
 
 
 # -------------------------------------------------------------------------------------------------

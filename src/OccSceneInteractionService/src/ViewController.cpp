@@ -21,28 +21,33 @@ void ViewController::setCameraListener(Handle(ICameraListener) pCameraListener)
 
 void ViewController::HandleViewEvents(const Handle(AIS_InteractiveContext) & pContext, const Handle(V3d_View) & pView)
 {
-    const auto wasAnimationStopped = myViewAnimation && myViewAnimation->IsStopped();
     AIS_ViewController::HandleViewEvents(pContext, pView);
 
     if (myViewAnimation)
     {
-        const auto isAnimationStopped = myViewAnimation->IsStopped();
+        const auto isAnimationCurrentlyStopped = myViewAnimation->IsStopped();
 
         auto pCameraListener = m_pCameraListenerSyncObject.getRenderData();
-        if(!wasAnimationStopped && isAnimationStopped)
+        if (pCameraListener)
         {
-            pCameraListener->onAnimationStopped();
+            if(m_isAnimationInProgress && isAnimationCurrentlyStopped)
+            {
+                pCameraListener->onAnimationStopped();
+            }
+
+            if(!m_isAnimationInProgress && !isAnimationCurrentlyStopped)
+            {
+                pCameraListener->onAnimationStarted();
+            }
         }
 
-        if(wasAnimationStopped && !isAnimationStopped)
-        {
-            pCameraListener->onAnimationStarted();
-        }
+        m_isAnimationInProgress = !isAnimationCurrentlyStopped;
     }
 }
 
 void ViewController::flushBuffers(const Handle(AIS_InteractiveContext) &pContext, const Handle(V3d_View) &pView)
 {
+    AIS_ViewController::flushBuffers(pContext, pView);
     m_pCameraListenerSyncObject.sync();
 }
 
