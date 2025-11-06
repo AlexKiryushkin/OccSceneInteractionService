@@ -1,0 +1,121 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - 'README.md'
+      - 'LICENSE'
+  pull_request:
+    branches: [ main ]
+    paths-ignore:
+      - 'README.md'
+      - 'LICENSE'
+concurrency: 
+  group: ${{ github.workflow }}-${{github.event_name}}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  PRODUCT: OSIS
+
+jobs:
+  build:
+
+    name: Build on ${{ matrix.config.os }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        - os: ubuntu-latest
+          build_type: Release
+
+        - os: macos-latest
+          build_type: Release
+
+        - os: windows-latest
+          build_type: Release
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup CMake
+        uses: jwlawson/actions-setup-cmake@v2
+        with: 
+          cmake-version: '3.24.x'
+
+      - name: Install MacOS vcpkg OCC deps
+        if: runner.os == 'macOS'
+        run:  brew install autoconf autoconf-archive automake libtool
+
+      - name: Install Linux vcpkg OCC deps
+        if: runner.os == 'Linux'
+        run: sudo apt install autoconf autoconf-archive automake libtool pkg-config libgl-dev libopengl-dev libgl1-mesa-dev |
+             sudo apt upgrade
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install Conan
+        run: |
+          pip install conan==2.*
+
+      - name: Cache Conan packages. We hash conanfile.txt so that the new key is generated when we change it.
+        uses: actions/cache@v4
+        with:
+          path: ~/.conan2
+          key: conan-${{ runner.os }}-${{ hashFiles('conanfile.*') }}
+          restore-keys: |
+            conan-${{ runner.os }}-
+
+      - name: Configure Conan
+        run: |
+          conan profile detect || true
+
+      - name: Install dependencies
+        run: |
+          conan install . --output-folder=build --build=missing -c tools.system.package_manager:mode=install -c tools.system.package_manager:sudo=True
+
+      - name: Configure
+        working-directory: build
+        run: >-
+          cmake 
+          -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }}
+          -DOSIS_BUILD_TESTS:BOOL=ON
+          -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake"
+          ../
+
+      - name: Build
+        working-directory: build
+        run: |
+          cmake --build . --config ${{ matrix.config.build_type }}
+
+      - name: Test
+        if: runner.os == 'Windows'
+        working-directory: build
+        run: |
+          ctest -V
+
+      - name: Package
+        working-directory: build
+        run: |
+          cmake --build . --target package --config ${{ matrix.config.build_type }}
+          
+      - name: Upload Archive Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: OSIS-Installer-${{ runner.os }}-${{ matrix.config.build_type }}-Archive
+          path: |
+            ${{ github.workspace }}/build/OSIS-*-win64.zip
+            ${{ github.workspace }}/build/OSIS-*-*.tar.gz
+            ${{ github.workspace }}/build/OSIS-*-*.rpm
+          
+      - name: Upload Installer Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: OSIS-Installer-${{ runner.os }}-${{ matrix.config.build_type }}-Installer
+          path: |
+            ${{ github.workspace }}/build/OSIS-*-*.rpm

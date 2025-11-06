@@ -1,0 +1,7 @@
+[requires]
+opencascade/7.6.2
+gtest/1.15.0
+
+[generators]
+CMakeDeps
+CMakeToolchain
