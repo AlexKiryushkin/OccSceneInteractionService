@@ -3,6 +3,7 @@
 #define TESTS_USER_INTERACTION_SERVICE_TEST_VIEWER_CONTROLLER_BASE_H
 
 #include "TestsOccSceneInteractionService/MockCameraListener.h"
+#include "TestsOccSceneInteractionService/MockMouseClickHandler.h"
 
 #include <OccSceneInteractionService/ViewController.h>
 
@@ -30,6 +31,8 @@ class TestViewControllerBase : public testing::Test
     osis::ViewController m_aisViewController;
     Handle(testing::StrictMock<MockCameraListener>)
         m_pMockCameraListener = new testing::StrictMock<MockCameraListener>();
+    Handle(testing::StrictMock<MockMouseClickHandler>)
+        m_pMockMouseClickHandler = new testing::StrictMock<MockMouseClickHandler>();
 };
 
 } // namespace osis::test

@@ -12,10 +12,11 @@ namespace osis
 {
 
 class ICameraListener;
+class IMouseClickHandler;
 
 class ViewController : public AIS_ViewController
 {
-  public:
+  public: //! @name public methods
     OSIS_API ViewController();
 
     /**
@@ -24,44 +25,71 @@ class ViewController : public AIS_ViewController
      */
     void setCameraListener(Handle(ICameraListener) pCameraListener);
 
+    /**
+     * @brief Sets mouse click handler. Can be NULL, if no mouse click handler is needed. Is called from UI thread.
+     * @param pMouseClickHandler mouse click handler.
+     */
+    void setMouseClickHandler(Handle(IMouseClickHandler) pMouseClickHandler);
+
   public: //! @name public overridden methods
     /**
      * @brief Overridden method of HandleViewEvents. Is called from Render thread.
      */
-    void HandleViewEvents(const Handle(AIS_InteractiveContext) &pContext,
-                          const Handle(V3d_View) &pView) override;
+    void HandleViewEvents(const Handle(AIS_InteractiveContext) & pContext, const Handle(V3d_View) & pView) override;
+
+    bool UpdateMouseClick(const Graphic3d_Vec2i &point, Aspect_VKeyMouse button, Aspect_VKeyFlags modifiers,
+                          bool isDoubleClick) override;
 
   protected: //! @name protected overridden methods
     /**
      * @brief Overridden method of flushBuffers. Is called at sync stage between UI and Render threads.
      */
-    void flushBuffers(const Handle(AIS_InteractiveContext) &pContext,
-                      const Handle(V3d_View) &pView) override;
+    void flushBuffers(const Handle(AIS_InteractiveContext) & pContext, const Handle(V3d_View) & pView) override;
 
     /**
      * @brief Overridden method of handlePanning. Is called from Render thread.
      */
-    void handlePanning(const Handle(V3d_View) &view) override;
+    void handlePanning(const Handle(V3d_View) & view) override;
 
     /**
      * @brief Overridden method of handleZoom. Is called from Render thread.
      */
-    void handleZoom(const Handle(V3d_View) &view, const Aspect_ScrollDelta &params, const gp_Pnt *point) override;
+    void handleZoom(const Handle(V3d_View) & view, const Aspect_ScrollDelta &params, const gp_Pnt *point) override;
 
     /**
      * @brief Overridden method of handleOrbitRotation. Is called from Render thread.
      */
-    void handleOrbitRotation(const Handle(V3d_View) &view, const gp_Pnt &point, bool toLockZUp) override;
+    void handleOrbitRotation(const Handle(V3d_View) & view, const gp_Pnt &point, bool toLockZUp) override;
 
     /**
      * @brief Overridden method of handleViewRotation. Is called from Render thread.
      */
-    void handleViewRotation(const Handle(V3d_View) &view, double yawExtra, double pitchExtra, double roll,
+    void handleViewRotation(const Handle(V3d_View) & view, double yawExtra, double pitchExtra, double roll,
                             bool toRestartOnIncrement) override;
+
+  private:
+    struct MouseClickData
+    {
+        bool isValid() const { return button != Aspect_VKeyMouse_NONE; }
+
+        bool operator==(const MouseClickData &rhs) const
+        {
+            return std::tie(point, button, modifiers, isDoubleClick) ==
+                   std::tie(rhs.point, rhs.button, rhs.modifiers, rhs.isDoubleClick);
+        }
+
+        Graphic3d_Vec2i point;
+        Aspect_VKeyMouse button;
+        Aspect_VKeyFlags modifiers;
+        bool isDoubleClick;
+    };
 
   private:
     UiRenderSyncObject<Handle(ICameraListener)> m_pCameraListenerSyncObject;
     bool m_isAnimationInProgress = false;
+
+    UiRenderSyncObject<Handle(IMouseClickHandler)> m_pMouseClickHandlerSyncObject;
+    UiRenderSyncObject<MouseClickData> m_mouseClickDataSyncObject;
 };
 
 } // namespace osis

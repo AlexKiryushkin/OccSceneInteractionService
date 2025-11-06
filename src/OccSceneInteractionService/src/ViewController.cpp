@@ -2,6 +2,7 @@
 #include "OccSceneInteractionService/ViewController.h"
 
 #include "OccSceneInteractionService/ICameraListener.h"
+#include "OccSceneInteractionService/IMouseClickHandler.h"
 
 #include <AIS_AnimationCamera.hxx>
 #include <V3d_View.hxx>
@@ -17,6 +18,11 @@ ViewController::ViewController()
 void ViewController::setCameraListener(Handle(ICameraListener) pCameraListener)
 {
     m_pCameraListenerSyncObject.setUiData(std::move(pCameraListener));
+}
+
+void ViewController::setMouseClickHandler(Handle(IMouseClickHandler) pMouseClickHandler)
+{
+    m_pMouseClickHandlerSyncObject.setUiData(std::move(pMouseClickHandler));
 }
 
 void ViewController::HandleViewEvents(const Handle(AIS_InteractiveContext) & pContext, const Handle(V3d_View) & pView)
@@ -43,12 +49,40 @@ void ViewController::HandleViewEvents(const Handle(AIS_InteractiveContext) & pCo
 
         m_isAnimationInProgress = !isAnimationCurrentlyStopped;
     }
+
+    if(auto pMouseClickHandler = m_pMouseClickHandlerSyncObject.getRenderData();
+       pMouseClickHandler && m_mouseClickDataSyncObject.getRenderData().isValid())
+    {
+        auto &&mouseClickData = m_mouseClickDataSyncObject.getRenderData();
+        pMouseClickHandler->handleMouseClicked(mouseClickData.point, mouseClickData.button, mouseClickData.modifiers,
+                                               mouseClickData.isDoubleClick);
+
+        m_mouseClickDataSyncObject.resetRenderData();
+    }
+}
+
+bool ViewController::UpdateMouseClick(const Graphic3d_Vec2i &point, Aspect_VKeyMouse button, Aspect_VKeyFlags modifiers,
+                                      bool isDoubleClick)
+{
+    auto toUpdateView = AIS_ViewController::UpdateMouseClick(point, button, modifiers, isDoubleClick);
+
+    if(auto pMouseClickHandler = m_pMouseClickHandlerSyncObject.getUiData();
+       pMouseClickHandler && pMouseClickHandler->actsOn(button, modifiers, isDoubleClick))
+    {
+        m_mouseClickDataSyncObject.setUiData(MouseClickData{point, button, modifiers, isDoubleClick});
+        toUpdateView = true;
+    }
+
+    return toUpdateView;
 }
 
 void ViewController::flushBuffers(const Handle(AIS_InteractiveContext) &pContext, const Handle(V3d_View) &pView)
 {
     AIS_ViewController::flushBuffers(pContext, pView);
     m_pCameraListenerSyncObject.sync();
+
+    m_pMouseClickHandlerSyncObject.sync();
+    m_mouseClickDataSyncObject.sync();
 }
 
 void ViewController::handlePanning(const Handle(V3d_View) &view)

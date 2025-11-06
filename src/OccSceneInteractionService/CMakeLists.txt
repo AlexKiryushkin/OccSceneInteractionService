@@ -26,6 +26,7 @@ target_sources(${LIBRARY_NAME}
         FILE_SET ${PUBLIC_HEADER_SET}
         TYPE HEADERS
         FILES ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/ICameraListener.h
+              ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/IMouseClickHandler.h
               ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/UiRenderSyncObject.h
               ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/ViewController.h
 )
