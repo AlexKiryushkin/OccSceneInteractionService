@@ -66,12 +66,21 @@ target_include_directories(
 
 
 # -------------------------------------------------------------------------------------------------
+# Target properties
+# -------------------------------------------------------------------------------------------------
+set_target_properties(${TEST_EXECUTABLE_NAME} PROPERTIES CXX_STANDARD 17)
+
+
+# -------------------------------------------------------------------------------------------------
 # Compile definitions
 # -------------------------------------------------------------------------------------------------
-target_compile_definitions(
-    ${TEST_EXECUTABLE_NAME} PUBLIC
-        GTEST_LINKED_AS_SHARED_LIBRARY
-    )
+get_target_property(gtest_targetType GTest::gtest_main TYPE)
+if(TARGET_TYPE STREQUAL "SHARED_LIBRARY")
+    target_compile_definitions(
+        ${TEST_EXECUTABLE_NAME} PRIVATE
+            GTEST_LINKED_AS_SHARED_LIBRARY
+        )
+endif()
 
 
 # -------------------------------------------------------------------------------------------------

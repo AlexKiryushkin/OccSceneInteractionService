@@ -75,6 +75,12 @@ target_include_directories(${PROJECT_NAME}
 
 
 # -------------------------------------------------------------------------------------------------
+# Target properties
+# -------------------------------------------------------------------------------------------------
+set_target_properties(${TEST_EXECUTABLE_NAME} PROPERTIES CXX_STANDARD 17)
+
+
+# -------------------------------------------------------------------------------------------------
 # Install Library
 # -------------------------------------------------------------------------------------------------
 get_target_property(OSIS_INSTALLED_HEADERS ${LIBRARY_NAME} HEADER_SET_${PUBLIC_HEADER_SET})
