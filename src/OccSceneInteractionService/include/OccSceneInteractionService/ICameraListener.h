@@ -32,7 +32,7 @@ class ICameraListener : public Standard_Transient
     ICameraListener &operator=(const ICameraListener &) = default;
     ICameraListener &operator=(ICameraListener &&) = default;
 
-    virtual ~ICameraListener() = default;
+    ~ICameraListener() override = default;
 
     /**
      * @brief Is called when camera animation started. Camera animation means changing camera position within each

@@ -22,10 +22,10 @@ class TestViewControllerRotation : public TestViewControllerBase
  */
 TEST_F(TestViewControllerRotation, input_rotationStart)
 {
-    auto &&guiInputBuffer = m_aisViewController.InputBuffer(AIS_ViewInputBufferType_UI);
-    auto &&renderInputBuffer = m_aisViewController.InputBuffer(AIS_ViewInputBufferType_GL);
+    auto &&guiInputBuffer = getViewController().InputBuffer(AIS_ViewInputBufferType_UI);
+    auto &&renderInputBuffer = getViewController().InputBuffer(AIS_ViewInputBufferType_GL);
 
-    const auto needToUpdate = m_aisViewController.UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_RightButton,
+    const auto needToUpdate = getViewController().UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_RightButton,
                                                                      Aspect_VKeyFlags_CTRL, false);
 
     EXPECT_TRUE(needToUpdate);
@@ -33,7 +33,7 @@ TEST_F(TestViewControllerRotation, input_rotationStart)
     EXPECT_FALSE(guiInputBuffer.OrbitRotation.ToRotate);
     EXPECT_FALSE(guiInputBuffer.OrbitRotation.ToStart);
 
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
     EXPECT_TRUE(renderInputBuffer.IsNewGesture);
     EXPECT_FALSE(renderInputBuffer.OrbitRotation.ToRotate);
     EXPECT_FALSE(renderInputBuffer.OrbitRotation.ToStart);
@@ -46,11 +46,11 @@ TEST_F(TestViewControllerRotation, input_rotation_sameFrame)
 {
     const auto delta = Graphic3d_Vec2i{10, 10};
 
-    auto &&guiInputBuffer = m_aisViewController.InputBuffer(AIS_ViewInputBufferType_UI);
-    auto &&renderInputBuffer = m_aisViewController.InputBuffer(AIS_ViewInputBufferType_GL);
+    auto &&guiInputBuffer = getViewController().InputBuffer(AIS_ViewInputBufferType_UI);
+    auto &&renderInputBuffer = getViewController().InputBuffer(AIS_ViewInputBufferType_GL);
 
-    m_aisViewController.UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_RightButton, Aspect_VKeyFlags_CTRL, false);
-    const auto needToUpdate = m_aisViewController.UpdateMousePosition(
+    getViewController().UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_RightButton, Aspect_VKeyFlags_CTRL, false);
+    const auto needToUpdate = getViewController().UpdateMousePosition(
         m_defaultPoint + delta, Aspect_VKeyMouse_RightButton, Aspect_VKeyFlags_CTRL, false);
 
     EXPECT_TRUE(needToUpdate);
@@ -60,7 +60,7 @@ TEST_F(TestViewControllerRotation, input_rotation_sameFrame)
     EXPECT_EQ(guiInputBuffer.OrbitRotation.PointStart, Graphic3d_Vec2d{m_defaultPoint});
     EXPECT_EQ(guiInputBuffer.OrbitRotation.PointTo, Graphic3d_Vec2d{m_defaultPoint + delta});
 
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
     EXPECT_TRUE(renderInputBuffer.IsNewGesture);
     EXPECT_TRUE(renderInputBuffer.OrbitRotation.ToRotate);
     EXPECT_TRUE(renderInputBuffer.OrbitRotation.ToStart);
@@ -75,13 +75,13 @@ TEST_F(TestViewControllerRotation, input_rotation_differentFrames)
 {
     const auto delta = Graphic3d_Vec2i{10, 10};
 
-    auto &&guiInputBuffer = m_aisViewController.InputBuffer(AIS_ViewInputBufferType_UI);
-    auto &&renderInputBuffer = m_aisViewController.InputBuffer(AIS_ViewInputBufferType_GL);
+    auto &&guiInputBuffer = getViewController().InputBuffer(AIS_ViewInputBufferType_UI);
+    auto &&renderInputBuffer = getViewController().InputBuffer(AIS_ViewInputBufferType_GL);
 
-    m_aisViewController.UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_RightButton, Aspect_VKeyFlags_CTRL, false);
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+    getViewController().UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_RightButton, Aspect_VKeyFlags_CTRL, false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
 
-    const auto needToUpdate = m_aisViewController.UpdateMousePosition(
+    const auto needToUpdate = getViewController().UpdateMousePosition(
         m_defaultPoint + delta, Aspect_VKeyMouse_RightButton, Aspect_VKeyFlags_CTRL, false);
 
     EXPECT_TRUE(needToUpdate);
@@ -91,7 +91,7 @@ TEST_F(TestViewControllerRotation, input_rotation_differentFrames)
     EXPECT_EQ(guiInputBuffer.OrbitRotation.PointStart, Graphic3d_Vec2d{m_defaultPoint});
     EXPECT_EQ(guiInputBuffer.OrbitRotation.PointTo, Graphic3d_Vec2d{m_defaultPoint + delta});
 
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
     EXPECT_FALSE(renderInputBuffer.IsNewGesture);
     EXPECT_TRUE(renderInputBuffer.OrbitRotation.ToRotate);
     EXPECT_TRUE(renderInputBuffer.OrbitRotation.ToStart);
@@ -106,13 +106,13 @@ TEST_F(TestViewControllerRotation, input_rotationDisallowed)
 {
     const auto delta = Graphic3d_Vec2i{10, 10};
 
-    m_aisViewController.SetAllowRotation(false);
+    getViewController().SetAllowRotation(false);
 
-    auto &&guiInputBuffer = m_aisViewController.InputBuffer(AIS_ViewInputBufferType_UI);
-    auto &&renderInputBuffer = m_aisViewController.InputBuffer(AIS_ViewInputBufferType_GL);
+    auto &&guiInputBuffer = getViewController().InputBuffer(AIS_ViewInputBufferType_UI);
+    auto &&renderInputBuffer = getViewController().InputBuffer(AIS_ViewInputBufferType_GL);
 
-    m_aisViewController.UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_RightButton, Aspect_VKeyFlags_CTRL, false);
-    const auto needToUpdate = m_aisViewController.UpdateMousePosition(
+    getViewController().UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_RightButton, Aspect_VKeyFlags_CTRL, false);
+    const auto needToUpdate = getViewController().UpdateMousePosition(
         m_defaultPoint + delta, Aspect_VKeyMouse_RightButton, Aspect_VKeyFlags_CTRL, false);
 
     EXPECT_FALSE(needToUpdate);
@@ -120,7 +120,7 @@ TEST_F(TestViewControllerRotation, input_rotationDisallowed)
     EXPECT_FALSE(guiInputBuffer.OrbitRotation.ToRotate);
     EXPECT_FALSE(guiInputBuffer.OrbitRotation.ToStart);
 
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
     EXPECT_FALSE(renderInputBuffer.IsNewGesture);
     EXPECT_FALSE(renderInputBuffer.OrbitRotation.ToRotate);
     EXPECT_FALSE(renderInputBuffer.OrbitRotation.ToStart);
@@ -134,16 +134,16 @@ TEST_F(TestViewControllerRotation, input_rotationTwice_differentFrames)
     const auto delta1 = Graphic3d_Vec2i{10, 10};
     const auto delta2 = Graphic3d_Vec2i{15, 30};
 
-    auto &&guiInputBuffer = m_aisViewController.InputBuffer(AIS_ViewInputBufferType_UI);
-    auto &&renderInputBuffer = m_aisViewController.InputBuffer(AIS_ViewInputBufferType_GL);
+    auto &&guiInputBuffer = getViewController().InputBuffer(AIS_ViewInputBufferType_UI);
+    auto &&renderInputBuffer = getViewController().InputBuffer(AIS_ViewInputBufferType_GL);
 
-    m_aisViewController.UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_RightButton, Aspect_VKeyFlags_CTRL, false);
-    m_aisViewController.UpdateMousePosition(m_defaultPoint + delta1, Aspect_VKeyMouse_RightButton,
+    getViewController().UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_RightButton, Aspect_VKeyFlags_CTRL, false);
+    getViewController().UpdateMousePosition(m_defaultPoint + delta1, Aspect_VKeyMouse_RightButton,
                                             Aspect_VKeyFlags_CTRL, false);
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
-    m_aisViewController.HandleViewEvents(getContext(), getView());
+    getViewController().FlushViewEvents(getContext(), getView(), false);
+    getViewController().HandleViewEvents(getContext(), getView());
 
-    const auto needToUpdate = m_aisViewController.UpdateMousePosition(
+    const auto needToUpdate = getViewController().UpdateMousePosition(
         m_defaultPoint + delta2, Aspect_VKeyMouse_RightButton, Aspect_VKeyFlags_CTRL, false);
 
     EXPECT_TRUE(needToUpdate);
@@ -153,7 +153,7 @@ TEST_F(TestViewControllerRotation, input_rotationTwice_differentFrames)
     EXPECT_EQ(guiInputBuffer.OrbitRotation.PointStart, Graphic3d_Vec2d{m_defaultPoint});
     EXPECT_EQ(guiInputBuffer.OrbitRotation.PointTo, Graphic3d_Vec2d{m_defaultPoint + delta2});
 
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
     EXPECT_FALSE(renderInputBuffer.IsNewGesture);
     EXPECT_TRUE(renderInputBuffer.OrbitRotation.ToRotate);
     EXPECT_FALSE(renderInputBuffer.OrbitRotation.ToStart);
@@ -173,17 +173,17 @@ TEST_F(TestViewControllerRotation, event_rotationDisallowed_noNotify)
 {
     const auto delta = Graphic3d_Vec2i{10, 10};
 
-    m_aisViewController.SetAllowRotation(false);
-    m_aisViewController.setCameraListener(m_pMockCameraListener);
+    getViewController().SetAllowRotation(false);
+    getViewController().setCameraListener(getMockCameraListener());
 
-    m_aisViewController.UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_RightButton, Aspect_VKeyFlags_CTRL, false);
-    m_aisViewController.UpdateMousePosition(m_defaultPoint + delta, Aspect_VKeyMouse_RightButton, Aspect_VKeyFlags_CTRL,
+    getViewController().UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_RightButton, Aspect_VKeyFlags_CTRL, false);
+    getViewController().UpdateMousePosition(m_defaultPoint + delta, Aspect_VKeyMouse_RightButton, Aspect_VKeyFlags_CTRL,
                                             false);
 
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
 
-    EXPECT_CALL(*m_pMockCameraListener, onCameraRotation()).Times(0);
-    m_aisViewController.HandleViewEvents(getContext(), getView());
+    EXPECT_CALL(*getMockCameraListener(), onCameraRotation()).Times(0);
+    getViewController().HandleViewEvents(getContext(), getView());
 }
 
 /**
@@ -194,16 +194,16 @@ TEST_F(TestViewControllerRotation, event_rotation_sameFrame)
 {
     const auto delta = Graphic3d_Vec2i{10, 10};
 
-    m_aisViewController.setCameraListener(m_pMockCameraListener);
+    getViewController().setCameraListener(getMockCameraListener());
 
-    m_aisViewController.UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_RightButton, Aspect_VKeyFlags_CTRL, false);
-    m_aisViewController.UpdateMousePosition(m_defaultPoint + delta, Aspect_VKeyMouse_RightButton, Aspect_VKeyFlags_CTRL,
+    getViewController().UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_RightButton, Aspect_VKeyFlags_CTRL, false);
+    getViewController().UpdateMousePosition(m_defaultPoint + delta, Aspect_VKeyMouse_RightButton, Aspect_VKeyFlags_CTRL,
                                             false);
 
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
 
-    EXPECT_CALL(*m_pMockCameraListener, onCameraRotation());
-    m_aisViewController.HandleViewEvents(getContext(), getView());
+    EXPECT_CALL(*getMockCameraListener(), onCameraRotation());
+    getViewController().HandleViewEvents(getContext(), getView());
 }
 
 /**
@@ -214,18 +214,18 @@ TEST_F(TestViewControllerRotation, event_rotation_differentFrames)
 {
     const auto delta = Graphic3d_Vec2i{10, 10};
 
-    m_aisViewController.setCameraListener(m_pMockCameraListener);
+    getViewController().setCameraListener(getMockCameraListener());
 
-    m_aisViewController.UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_RightButton, Aspect_VKeyFlags_CTRL, false);
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
-    m_aisViewController.HandleViewEvents(getContext(), getView());
+    getViewController().UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_RightButton, Aspect_VKeyFlags_CTRL, false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
+    getViewController().HandleViewEvents(getContext(), getView());
 
-    m_aisViewController.UpdateMousePosition(m_defaultPoint + delta, Aspect_VKeyMouse_RightButton, Aspect_VKeyFlags_CTRL,
+    getViewController().UpdateMousePosition(m_defaultPoint + delta, Aspect_VKeyMouse_RightButton, Aspect_VKeyFlags_CTRL,
                                             false);
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
 
-    EXPECT_CALL(*m_pMockCameraListener, onCameraRotation());
-    m_aisViewController.HandleViewEvents(getContext(), getView());
+    EXPECT_CALL(*getMockCameraListener(), onCameraRotation());
+    getViewController().HandleViewEvents(getContext(), getView());
 }
 
 /**
@@ -237,20 +237,20 @@ TEST_F(TestViewControllerRotation, event_rotationTwice_oneCallback)
     const auto delta1 = Graphic3d_Vec2i{10, 10};
     const auto delta2 = Graphic3d_Vec2i{20, 20};
 
-    m_aisViewController.setCameraListener(m_pMockCameraListener);
+    getViewController().setCameraListener(getMockCameraListener());
 
-    m_aisViewController.UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_RightButton, Aspect_VKeyFlags_CTRL, false);
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
-    m_aisViewController.HandleViewEvents(getContext(), getView());
+    getViewController().UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_RightButton, Aspect_VKeyFlags_CTRL, false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
+    getViewController().HandleViewEvents(getContext(), getView());
 
-    m_aisViewController.UpdateMousePosition(m_defaultPoint + delta1, Aspect_VKeyMouse_RightButton,
+    getViewController().UpdateMousePosition(m_defaultPoint + delta1, Aspect_VKeyMouse_RightButton,
                                             Aspect_VKeyFlags_CTRL, false);
-    m_aisViewController.UpdateMousePosition(m_defaultPoint + delta2, Aspect_VKeyMouse_RightButton,
+    getViewController().UpdateMousePosition(m_defaultPoint + delta2, Aspect_VKeyMouse_RightButton,
                                             Aspect_VKeyFlags_CTRL, false);
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
 
-    EXPECT_CALL(*m_pMockCameraListener, onCameraRotation());
-    m_aisViewController.HandleViewEvents(getContext(), getView());
+    EXPECT_CALL(*getMockCameraListener(), onCameraRotation());
+    getViewController().HandleViewEvents(getContext(), getView());
 }
 
 /**
@@ -262,25 +262,25 @@ TEST_F(TestViewControllerRotation, event_rotationTwice_differentFrames)
     const auto delta1 = Graphic3d_Vec2i{10, 10};
     const auto delta2 = Graphic3d_Vec2i{20, 20};
 
-    m_aisViewController.setCameraListener(m_pMockCameraListener);
+    getViewController().setCameraListener(getMockCameraListener());
 
-    m_aisViewController.UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_RightButton, Aspect_VKeyFlags_CTRL, false);
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
-    m_aisViewController.HandleViewEvents(getContext(), getView());
+    getViewController().UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_RightButton, Aspect_VKeyFlags_CTRL, false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
+    getViewController().HandleViewEvents(getContext(), getView());
 
-    m_aisViewController.UpdateMousePosition(m_defaultPoint + delta1, Aspect_VKeyMouse_RightButton,
+    getViewController().UpdateMousePosition(m_defaultPoint + delta1, Aspect_VKeyMouse_RightButton,
                                             Aspect_VKeyFlags_CTRL, false);
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
 
-    EXPECT_CALL(*m_pMockCameraListener, onCameraRotation());
-    m_aisViewController.HandleViewEvents(getContext(), getView());
+    EXPECT_CALL(*getMockCameraListener(), onCameraRotation());
+    getViewController().HandleViewEvents(getContext(), getView());
 
-    m_aisViewController.UpdateMousePosition(m_defaultPoint + delta2, Aspect_VKeyMouse_RightButton,
+    getViewController().UpdateMousePosition(m_defaultPoint + delta2, Aspect_VKeyMouse_RightButton,
                                             Aspect_VKeyFlags_CTRL, false);
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
 
-    EXPECT_CALL(*m_pMockCameraListener, onCameraRotation());
-    m_aisViewController.HandleViewEvents(getContext(), getView());
+    EXPECT_CALL(*getMockCameraListener(), onCameraRotation());
+    getViewController().HandleViewEvents(getContext(), getView());
 }
 
 } // namespace osis::test

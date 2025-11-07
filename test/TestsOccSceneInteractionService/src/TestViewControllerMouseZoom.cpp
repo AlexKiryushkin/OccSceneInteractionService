@@ -24,17 +24,17 @@ class TestViewControllerMouseZoom : public TestViewControllerBase
  */
 TEST_F(TestViewControllerMouseZoom, input_zoomStart)
 {
-    auto &&guiInputBuffer = m_aisViewController.InputBuffer(AIS_ViewInputBufferType_UI);
-    auto &&renderInputBuffer = m_aisViewController.InputBuffer(AIS_ViewInputBufferType_GL);
+    auto &&guiInputBuffer = getViewController().InputBuffer(AIS_ViewInputBufferType_UI);
+    auto &&renderInputBuffer = getViewController().InputBuffer(AIS_ViewInputBufferType_GL);
 
-    const auto needToUpdate = m_aisViewController.UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton,
+    const auto needToUpdate = getViewController().UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton,
                                                                      Aspect_VKeyFlags_CTRL, false);
 
     EXPECT_TRUE(needToUpdate);
     EXPECT_TRUE(guiInputBuffer.IsNewGesture);
     EXPECT_TRUE(guiInputBuffer.ZoomActions.IsEmpty());
 
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
     EXPECT_TRUE(renderInputBuffer.IsNewGesture);
     EXPECT_TRUE(renderInputBuffer.ZoomActions.IsEmpty());
 }
@@ -44,17 +44,17 @@ TEST_F(TestViewControllerMouseZoom, input_zoomStart)
  */
 TEST_F(TestViewControllerMouseZoom, input_zoom_sameFrame)
 {
-    auto &&guiInputBuffer = m_aisViewController.InputBuffer(AIS_ViewInputBufferType_UI);
-    auto &&renderInputBuffer = m_aisViewController.InputBuffer(AIS_ViewInputBufferType_GL);
+    auto &&guiInputBuffer = getViewController().InputBuffer(AIS_ViewInputBufferType_UI);
+    auto &&renderInputBuffer = getViewController().InputBuffer(AIS_ViewInputBufferType_GL);
 
     for(auto delta :
         {Graphic3d_Vec2i{10, 10}, Graphic3d_Vec2i{10, -10}, Graphic3d_Vec2i{-10, 10}, Graphic3d_Vec2i{-10, -10}})
     {
-        m_aisViewController.ResetViewInput();
+        getViewController().ResetViewInput();
 
-        m_aisViewController.UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_CTRL,
+        getViewController().UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_CTRL,
                                                false);
-        const auto needToUpdate = m_aisViewController.UpdateMousePosition(
+        const auto needToUpdate = getViewController().UpdateMousePosition(
             m_defaultPoint + delta, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_CTRL, false);
 
         EXPECT_TRUE(needToUpdate);
@@ -65,7 +65,7 @@ TEST_F(TestViewControllerMouseZoom, input_zoom_sameFrame)
         // same signs
         EXPECT_GT(guiInputBuffer.ZoomActions.First().Delta * delta.x(), 0.0);
 
-        m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+        getViewController().FlushViewEvents(getContext(), getView(), false);
         EXPECT_TRUE(renderInputBuffer.IsNewGesture);
         EXPECT_EQ(renderInputBuffer.ZoomActions.Size(), 1ULL);
         EXPECT_FALSE(renderInputBuffer.ZoomActions.First().HasPoint());
@@ -80,17 +80,17 @@ TEST_F(TestViewControllerMouseZoom, input_zoom_sameFrame)
  */
 TEST_F(TestViewControllerMouseZoom, input_zoom_differentFrames)
 {
-    auto &&guiInputBuffer = m_aisViewController.InputBuffer(AIS_ViewInputBufferType_UI);
-    auto &&renderInputBuffer = m_aisViewController.InputBuffer(AIS_ViewInputBufferType_GL);
+    auto &&guiInputBuffer = getViewController().InputBuffer(AIS_ViewInputBufferType_UI);
+    auto &&renderInputBuffer = getViewController().InputBuffer(AIS_ViewInputBufferType_GL);
 
     for(auto delta :
         {Graphic3d_Vec2i{10, 10}, Graphic3d_Vec2i{10, -10}, Graphic3d_Vec2i{-10, 10}, Graphic3d_Vec2i{-10, -10}})
     {
-        m_aisViewController.UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_CTRL,
+        getViewController().UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_CTRL,
                                                false);
-        m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+        getViewController().FlushViewEvents(getContext(), getView(), false);
 
-        const auto needToUpdate = m_aisViewController.UpdateMousePosition(
+        const auto needToUpdate = getViewController().UpdateMousePosition(
             m_defaultPoint + delta, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_CTRL, false);
 
         EXPECT_TRUE(needToUpdate);
@@ -101,7 +101,7 @@ TEST_F(TestViewControllerMouseZoom, input_zoom_differentFrames)
         // same signs
         EXPECT_GT(guiInputBuffer.ZoomActions.First().Delta * delta.x(), 0.0);
 
-        m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+        getViewController().FlushViewEvents(getContext(), getView(), false);
         EXPECT_FALSE(renderInputBuffer.IsNewGesture);
         EXPECT_EQ(renderInputBuffer.ZoomActions.Size(), 1ULL);
         EXPECT_FALSE(renderInputBuffer.ZoomActions.First().HasPoint());
@@ -118,21 +118,21 @@ TEST_F(TestViewControllerMouseZoom, input_zoomDisallowed)
 {
     const auto delta = Graphic3d_Vec2i{10, 10};
 
-    m_aisViewController.SetAllowZooming(false);
+    getViewController().SetAllowZooming(false);
 
-    auto &&guiInputBuffer = m_aisViewController.InputBuffer(AIS_ViewInputBufferType_UI);
-    auto &&renderInputBuffer = m_aisViewController.InputBuffer(AIS_ViewInputBufferType_GL);
+    auto &&guiInputBuffer = getViewController().InputBuffer(AIS_ViewInputBufferType_UI);
+    auto &&renderInputBuffer = getViewController().InputBuffer(AIS_ViewInputBufferType_GL);
 
-    m_aisViewController.UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_CTRL, false);
+    getViewController().UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_CTRL, false);
 
-    const auto needToUpdate = m_aisViewController.UpdateMousePosition(
+    const auto needToUpdate = getViewController().UpdateMousePosition(
         m_defaultPoint + delta, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_CTRL, false);
 
     EXPECT_FALSE(needToUpdate);
     EXPECT_FALSE(guiInputBuffer.IsNewGesture);
     EXPECT_TRUE(guiInputBuffer.ZoomActions.IsEmpty());
 
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
     EXPECT_FALSE(renderInputBuffer.IsNewGesture);
     EXPECT_TRUE(renderInputBuffer.ZoomActions.IsEmpty());
 }
@@ -147,23 +147,23 @@ TEST_F(TestViewControllerMouseZoom, input_zoomDisallowed)
  */
 TEST_F(TestViewControllerMouseZoom, event_zoom_sameFrame)
 {
-    m_aisViewController.setCameraListener(m_pMockCameraListener);
+    getViewController().setCameraListener(getMockCameraListener());
 
     for(auto delta :
         {Graphic3d_Vec2i{10, 10}, Graphic3d_Vec2i{10, -10}, Graphic3d_Vec2i{-10, 10}, Graphic3d_Vec2i{-10, -10}})
     {
-        m_aisViewController.ResetViewInput();
+        getViewController().ResetViewInput();
 
-        m_aisViewController.UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_CTRL,
+        getViewController().UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_CTRL,
                                                false);
-        m_aisViewController.UpdateMousePosition(m_defaultPoint + delta, Aspect_VKeyMouse_LeftButton,
+        getViewController().UpdateMousePosition(m_defaultPoint + delta, Aspect_VKeyMouse_LeftButton,
                                                 Aspect_VKeyFlags_CTRL, false);
 
-        m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+        getViewController().FlushViewEvents(getContext(), getView(), false);
 
         double zoomDelta{};
-        EXPECT_CALL(*m_pMockCameraListener, onCameraScaleChanged(_)).WillOnce(testing::SaveArg<0>(&zoomDelta));
-        m_aisViewController.HandleViewEvents(getContext(), getView());
+        EXPECT_CALL(*getMockCameraListener(), onCameraScaleChanged(_)).WillOnce(testing::SaveArg<0>(&zoomDelta));
+        getViewController().HandleViewEvents(getContext(), getView());
 
         // same signs
         EXPECT_GT(zoomDelta * delta.x(), 0.0);
@@ -176,24 +176,24 @@ TEST_F(TestViewControllerMouseZoom, event_zoom_sameFrame)
  */
 TEST_F(TestViewControllerMouseZoom, event_zoom_differentFrames)
 {
-    m_aisViewController.setCameraListener(m_pMockCameraListener);
+    getViewController().setCameraListener(getMockCameraListener());
 
     for(auto delta :
         {Graphic3d_Vec2i{10, 10}, Graphic3d_Vec2i{10, -10}, Graphic3d_Vec2i{-10, 10}, Graphic3d_Vec2i{-10, -10}})
     {
-        m_aisViewController.ResetViewInput();
+        getViewController().ResetViewInput();
 
-        m_aisViewController.UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_CTRL,
+        getViewController().UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_CTRL,
                                                false);
-        m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+        getViewController().FlushViewEvents(getContext(), getView(), false);
 
-        m_aisViewController.UpdateMousePosition(m_defaultPoint + delta, Aspect_VKeyMouse_LeftButton,
+        getViewController().UpdateMousePosition(m_defaultPoint + delta, Aspect_VKeyMouse_LeftButton,
                                                 Aspect_VKeyFlags_CTRL, false);
-        m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+        getViewController().FlushViewEvents(getContext(), getView(), false);
 
         double zoomDelta{};
-        EXPECT_CALL(*m_pMockCameraListener, onCameraScaleChanged(_)).WillOnce(testing::SaveArg<0>(&zoomDelta));
-        m_aisViewController.HandleViewEvents(getContext(), getView());
+        EXPECT_CALL(*getMockCameraListener(), onCameraScaleChanged(_)).WillOnce(testing::SaveArg<0>(&zoomDelta));
+        getViewController().HandleViewEvents(getContext(), getView());
 
         // same signs
         EXPECT_GT(zoomDelta * delta.x(), 0.0);
@@ -207,16 +207,16 @@ TEST_F(TestViewControllerMouseZoom, event_zoomDisallowed_noNotify)
 {
     const auto delta = Graphic3d_Vec2i{10, 10};
 
-    m_aisViewController.SetAllowZooming(false);
-    m_aisViewController.setCameraListener(m_pMockCameraListener);
+    getViewController().SetAllowZooming(false);
+    getViewController().setCameraListener(getMockCameraListener());
 
-    m_aisViewController.UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_CTRL, false);
-    m_aisViewController.UpdateMousePosition(m_defaultPoint + delta, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_CTRL,
+    getViewController().UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_CTRL, false);
+    getViewController().UpdateMousePosition(m_defaultPoint + delta, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_CTRL,
                                             false);
 
-    EXPECT_CALL(*m_pMockCameraListener, onCameraScaleChanged(_)).Times(0);
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
-    m_aisViewController.HandleViewEvents(getContext(), getView());
+    EXPECT_CALL(*getMockCameraListener(), onCameraScaleChanged(_)).Times(0);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
+    getViewController().HandleViewEvents(getContext(), getView());
 }
 
 /**
@@ -227,20 +227,20 @@ TEST_F(TestViewControllerMouseZoom, event_zoomTwice_oneCallback)
 {
     const auto delta1 = Graphic3d_Vec2i{10, 10};
     const auto delta2 = Graphic3d_Vec2i{20, 20};
-    m_aisViewController.setCameraListener(m_pMockCameraListener);
+    getViewController().setCameraListener(getMockCameraListener());
 
-    m_aisViewController.UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_CTRL, false);
-    m_aisViewController.UpdateMousePosition(m_defaultPoint + delta1, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_CTRL,
+    getViewController().UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_CTRL, false);
+    getViewController().UpdateMousePosition(m_defaultPoint + delta1, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_CTRL,
                                             false);
-    m_aisViewController.UpdateMousePosition(m_defaultPoint + delta2, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_CTRL,
+    getViewController().UpdateMousePosition(m_defaultPoint + delta2, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_CTRL,
                                             false);
 
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
 
     double zoomDelta{};
 
-    EXPECT_CALL(*m_pMockCameraListener, onCameraScaleChanged(_)).WillOnce(testing::SaveArg<0>(&zoomDelta));
-    m_aisViewController.HandleViewEvents(getContext(), getView());
+    EXPECT_CALL(*getMockCameraListener(), onCameraScaleChanged(_)).WillOnce(testing::SaveArg<0>(&zoomDelta));
+    getViewController().HandleViewEvents(getContext(), getView());
 
     // same signs
     EXPECT_GT(zoomDelta, 0.0);
@@ -254,26 +254,26 @@ TEST_F(TestViewControllerMouseZoom, event_zoomTwiceInDifferentFrames)
 {
     const auto delta1 = Graphic3d_Vec2i{10, 10};
     const auto delta2 = Graphic3d_Vec2i{20, 20};
-    m_aisViewController.setCameraListener(m_pMockCameraListener);
+    getViewController().setCameraListener(getMockCameraListener());
 
-    m_aisViewController.UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_CTRL, false);
-    m_aisViewController.UpdateMousePosition(m_defaultPoint + delta1, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_CTRL,
+    getViewController().UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_CTRL, false);
+    getViewController().UpdateMousePosition(m_defaultPoint + delta1, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_CTRL,
                                             false);
 
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
 
     double zoomDelta{};
 
-    EXPECT_CALL(*m_pMockCameraListener, onCameraScaleChanged(_)).WillOnce(testing::SaveArg<0>(&zoomDelta));
-    m_aisViewController.HandleViewEvents(getContext(), getView());
+    EXPECT_CALL(*getMockCameraListener(), onCameraScaleChanged(_)).WillOnce(testing::SaveArg<0>(&zoomDelta));
+    getViewController().HandleViewEvents(getContext(), getView());
     EXPECT_GT(zoomDelta, 0.0);
 
-    m_aisViewController.UpdateMousePosition(m_defaultPoint + delta2, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_CTRL,
+    getViewController().UpdateMousePosition(m_defaultPoint + delta2, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_CTRL,
                                             false);
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
 
-    EXPECT_CALL(*m_pMockCameraListener, onCameraScaleChanged(_)).WillOnce(testing::SaveArg<0>(&zoomDelta));
-    m_aisViewController.HandleViewEvents(getContext(), getView());
+    EXPECT_CALL(*getMockCameraListener(), onCameraScaleChanged(_)).WillOnce(testing::SaveArg<0>(&zoomDelta));
+    getViewController().HandleViewEvents(getContext(), getView());
     EXPECT_GT(zoomDelta, 0.0);
 }
 

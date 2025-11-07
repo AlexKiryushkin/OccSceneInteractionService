@@ -9,7 +9,6 @@ namespace osis::test
 {
 
 TestViewControllerBase::TestViewControllerBase()
-    : testing::Test{}
 {
     Handle(Aspect_DisplayConnection) pDisplayConnection = new Aspect_DisplayConnection();
     Handle(OpenGl_GraphicDriver) pGraphicDriver = new OpenGl_GraphicDriver(pDisplayConnection, false);

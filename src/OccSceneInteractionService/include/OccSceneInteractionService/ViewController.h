@@ -17,7 +17,7 @@ class IMouseClickHandler;
 class ViewController : public AIS_ViewController
 {
   public: //! @name public methods
-    OSIS_API ViewController();
+    OSIS_API ViewController() = default;
 
     /**
      * @brief Sets camera listener. Can be NULL, if no camera listener is needed. Is called from UI thread.
@@ -70,7 +70,7 @@ class ViewController : public AIS_ViewController
   private:
     struct MouseClickData
     {
-        bool isValid() const { return button != Aspect_VKeyMouse_NONE; }
+        [[nodiscard]] bool isValid() const { return button != Aspect_VKeyMouse_NONE; }
 
         bool operator==(const MouseClickData &rhs) const
         {
@@ -78,10 +78,10 @@ class ViewController : public AIS_ViewController
                    std::tie(rhs.point, rhs.button, rhs.modifiers, rhs.isDoubleClick);
         }
 
-        Graphic3d_Vec2i point;
-        Aspect_VKeyMouse button;
-        Aspect_VKeyFlags modifiers;
-        bool isDoubleClick;
+        Graphic3d_Vec2i point{};
+        Aspect_VKeyMouse button{};
+        Aspect_VKeyFlags modifiers{};
+        bool isDoubleClick{};
     };
 
   private:
