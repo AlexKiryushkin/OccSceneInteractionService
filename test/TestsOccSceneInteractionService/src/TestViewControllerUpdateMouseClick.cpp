@@ -18,8 +18,9 @@ class TestViewControllerUpdateMouseClick : public TestViewControllerBase
  */
 TEST_F(TestViewControllerUpdateMouseClick, updateMouseClick_noHandler)
 {
-    m_aisViewController.UpdateMouseClick(
-        Graphic3d_Vec2i{100, 200}, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false);
+    const auto point = Graphic3d_Vec2i{100, 200};
+
+    m_aisViewController.UpdateMouseClick(point, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false);
 
     m_aisViewController.FlushViewEvents(getContext(), getView(), false);
     m_aisViewController.HandleViewEvents(getContext(), getView());
@@ -135,7 +136,8 @@ TEST_F(TestViewControllerUpdateMouseClick, updateMouseClick_callbackIsCalledOnly
     m_aisViewController.HandleViewEvents(getContext(), getView());
 
     EXPECT_CALL(*m_pMockMouseClickHandler,
-                handleMouseClicked(point, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false)).Times(0ULL);
+                handleMouseClicked(point, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false))
+        .Times(0ULL);
     m_aisViewController.FlushViewEvents(getContext(), getView(), false);
     m_aisViewController.HandleViewEvents(getContext(), getView());
 

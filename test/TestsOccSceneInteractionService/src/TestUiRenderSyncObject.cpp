@@ -8,11 +8,6 @@ namespace osis::test
 
 class TestUiRenderSyncObject : public ::testing::Test
 {
-  protected:
-    TestUiRenderSyncObject()
-        : testing::Test{}
-    {
-    }
 };
 
 TEST_F(TestUiRenderSyncObject, defaultInitialized)
