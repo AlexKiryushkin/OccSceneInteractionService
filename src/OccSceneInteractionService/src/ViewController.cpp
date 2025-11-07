@@ -3,8 +3,10 @@
 
 #include "OccSceneInteractionService/ICameraListener.h"
 #include "OccSceneInteractionService/IMouseClickHandler.h"
+#include "OccSceneInteractionService/IOwnerHoverListener.h"
 
 #include <AIS_AnimationCamera.hxx>
+#include <AIS_InteractiveContext.hxx>
 #include <V3d_View.hxx>
 
 namespace osis
@@ -18,6 +20,11 @@ void ViewController::setCameraListener(Handle(ICameraListener) pCameraListener)
 void ViewController::setMouseClickHandler(Handle(IMouseClickHandler) pMouseClickHandler)
 {
     m_pMouseClickHandlerSyncObject.setUiData(std::move(pMouseClickHandler));
+}
+
+void ViewController::setOwnerHoverListenerr(Handle(IOwnerHoverListener) pOwnerHoverListener)
+{
+    m_pOwnerHoverListenerSyncObject.setUiData(std::move(pOwnerHoverListener));
 }
 
 void ViewController::HandleViewEvents(const Handle(AIS_InteractiveContext) & pContext, const Handle(V3d_View) & pView)
@@ -78,6 +85,8 @@ void ViewController::flushBuffers(const Handle(AIS_InteractiveContext) & pContex
 
     m_pMouseClickHandlerSyncObject.sync();
     m_mouseClickDataSyncObject.sync();
+
+    m_pOwnerHoverListenerSyncObject.sync();
 }
 
 void ViewController::handlePanning(const Handle(V3d_View) & view)
@@ -123,6 +132,30 @@ void ViewController::handleViewRotation(const Handle(V3d_View) & view, double ya
     if(myToAllowRotation && myGL.ViewRotation.ToRotate && pCameraListener)
     {
         pCameraListener->onCameraRotation();
+    }
+}
+
+void ViewController::contextLazyMoveTo(const Handle(AIS_InteractiveContext) & context, const Handle(V3d_View) & view,
+                                       const Graphic3d_Vec2i &thePnt)
+{
+    const auto pPrevLastPicked = context->DetectedOwner();
+    AIS_ViewController::contextLazyMoveTo(context, view, thePnt);
+    const auto pCurrLastPicked = context->DetectedOwner();
+
+    auto pOwnerHoverListener = m_pOwnerHoverListenerSyncObject.getRenderData();
+    if((pPrevLastPicked == pCurrLastPicked) || !pOwnerHoverListener)
+    {
+        return;
+    }
+
+    if(!pPrevLastPicked.IsNull())
+    {
+        pOwnerHoverListener->handleOwnerStopHovered(pPrevLastPicked);
+    }
+
+    if(!pCurrLastPicked.IsNull())
+    {
+        pOwnerHoverListener->handleOwnerStartHovered(pCurrLastPicked);
     }
 }
 

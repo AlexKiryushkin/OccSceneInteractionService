@@ -13,6 +13,7 @@ namespace osis
 
 class ICameraListener;
 class IMouseClickHandler;
+class IOwnerHoverListener;
 
 class ViewController : public AIS_ViewController
 {
@@ -30,6 +31,12 @@ class ViewController : public AIS_ViewController
      * @param pMouseClickHandler mouse click handler.
      */
     void setMouseClickHandler(Handle(IMouseClickHandler) pMouseClickHandler);
+
+    /**
+     * @brief Sets owner hover listener. Can be NULL, if no owner hover listener is needed. Is called from UI thread.
+     * @param pOwnerHoverListener owner hover listener.
+     */
+    void setOwnerHoverListenerr(Handle(IOwnerHoverListener) pOwnerHoverListener);
 
   public: //! @name public overridden methods
     /**
@@ -67,6 +74,12 @@ class ViewController : public AIS_ViewController
     void handleViewRotation(const Handle(V3d_View) & view, double yawExtra, double pitchExtra, double roll,
                             bool toRestartOnIncrement) override;
 
+    /**
+     * @brief Overridden method of contextLazyMoveTo. Is called from Render thread.
+     */
+    void contextLazyMoveTo(const Handle(AIS_InteractiveContext) &context, const Handle(V3d_View) &view,
+                           const Graphic3d_Vec2i &thePnt) override;
+
   private:
     struct MouseClickData
     {
@@ -90,6 +103,8 @@ class ViewController : public AIS_ViewController
 
     UiRenderSyncObject<Handle(IMouseClickHandler)> m_pMouseClickHandlerSyncObject;
     UiRenderSyncObject<MouseClickData> m_mouseClickDataSyncObject;
+
+    UiRenderSyncObject<Handle(IOwnerHoverListener)> m_pOwnerHoverListenerSyncObject;
 };
 
 } // namespace osis
