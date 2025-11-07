@@ -1,0 +1,69 @@
+name: Configure Project
+
+description: Common configure steps for the project
+
+inputs:
+  build-type:
+    description: "Build type for CMake (Debug, Release, etc.)"
+    required: false
+    default: "Release"
+  os:
+    description: "Runner operation system"
+    required: true
+  
+runs:
+  using: "composite"
+  steps:
+      - name: Setup CMake
+        uses: jwlawson/actions-setup-cmake@v2
+        with: 
+          cmake-version: '3.24.x'
+
+      - name: Install MacOS packages
+        if: inputs.os == 'macOS'
+        shell: bash
+        run:  brew install autoconf autoconf-archive automake libtool
+
+      - name: Install Linux packages
+        if: inputs.os == 'Linux'
+        shell: bash
+        run: sudo apt install autoconf autoconf-archive automake libtool pkg-config libgl-dev libopengl-dev libgl1-mesa-dev
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install Conan
+        shell: bash
+        run: |
+          pip install conan==2.*
+
+      - name: Cache Conan packages. We hash conanfile.txt so that the new key is generated when we change it.
+        uses: actions/cache@v4
+        with:
+          path: ~/.conan2
+          key: conan-${{ inputs.os }}-${{ hashFiles('conanfile.*') }}
+          restore-keys: |
+            conan-${{ inputs.os }}-
+
+      - name: Configure Conan
+        shell: bash
+        run: |
+          conan profile detect || true
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          conan install . --output-folder=build --build=missing -c tools.system.package_manager:mode=install -c tools.system.package_manager:sudo=True
+
+      - name: Configure
+        shell: bash
+        working-directory: build
+        run: >-
+          cmake 
+          -DCMAKE_BUILD_TYPE=${{ inputs.build-type }}
+          -DOSIS_BUILD_TESTS:BOOL=ON
+          -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake"
+          -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          ../

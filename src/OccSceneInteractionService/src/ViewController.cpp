@@ -29,12 +29,12 @@ void ViewController::HandleViewEvents(const Handle(AIS_InteractiveContext) & pCo
 {
     AIS_ViewController::HandleViewEvents(pContext, pView);
 
-    if (myViewAnimation)
+    if(myViewAnimation)
     {
         const auto isAnimationCurrentlyStopped = myViewAnimation->IsStopped();
 
         auto pCameraListener = m_pCameraListenerSyncObject.getRenderData();
-        if (pCameraListener)
+        if(pCameraListener)
         {
             if(m_isAnimationInProgress && isAnimationCurrentlyStopped)
             {
@@ -76,7 +76,7 @@ bool ViewController::UpdateMouseClick(const Graphic3d_Vec2i &point, Aspect_VKeyM
     return toUpdateView;
 }
 
-void ViewController::flushBuffers(const Handle(AIS_InteractiveContext) &pContext, const Handle(V3d_View) &pView)
+void ViewController::flushBuffers(const Handle(AIS_InteractiveContext) & pContext, const Handle(V3d_View) & pView)
 {
     AIS_ViewController::flushBuffers(pContext, pView);
     m_pCameraListenerSyncObject.sync();
@@ -85,7 +85,7 @@ void ViewController::flushBuffers(const Handle(AIS_InteractiveContext) &pContext
     m_mouseClickDataSyncObject.sync();
 }
 
-void ViewController::handlePanning(const Handle(V3d_View) &view)
+void ViewController::handlePanning(const Handle(V3d_View) & view)
 {
     AIS_ViewController::handlePanning(view);
 
@@ -96,7 +96,7 @@ void ViewController::handlePanning(const Handle(V3d_View) &view)
     }
 }
 
-void ViewController::handleZoom(const Handle(V3d_View) &view, const Aspect_ScrollDelta &params, const gp_Pnt *point)
+void ViewController::handleZoom(const Handle(V3d_View) & view, const Aspect_ScrollDelta &params, const gp_Pnt *point)
 {
     AIS_ViewController::handleZoom(view, params, point);
 
@@ -107,7 +107,8 @@ void ViewController::handleZoom(const Handle(V3d_View) &view, const Aspect_Scrol
     }
 }
 
-void ViewController::handleOrbitRotation(const Handle(V3d_View) &view, const gp_Pnt &point, bool toLockZUp) {
+void ViewController::handleOrbitRotation(const Handle(V3d_View) & view, const gp_Pnt &point, bool toLockZUp)
+{
 
     AIS_ViewController::handleOrbitRotation(view, point, toLockZUp);
 
@@ -118,7 +119,7 @@ void ViewController::handleOrbitRotation(const Handle(V3d_View) &view, const gp_
     }
 }
 
-void ViewController::handleViewRotation(const Handle(V3d_View) &view, double yawExtra, double pitchExtra, double roll,
+void ViewController::handleViewRotation(const Handle(V3d_View) & view, double yawExtra, double pitchExtra, double roll,
                                         bool toRestartOnIncrement)
 {
     AIS_ViewController::handleViewRotation(view, yawExtra, pitchExtra, roll, toRestartOnIncrement);
