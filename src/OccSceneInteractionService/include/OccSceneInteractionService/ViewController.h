@@ -78,7 +78,7 @@ class ViewController : public AIS_ViewController
                    std::tie(rhs.point, rhs.button, rhs.modifiers, rhs.isDoubleClick);
         }
 
-        Graphic3d_Vec2i point{};
+        Graphic3d_Vec2i point;
         Aspect_VKeyMouse button{};
         Aspect_VKeyFlags modifiers{};
         bool isDoubleClick{};
