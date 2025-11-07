@@ -31,7 +31,7 @@ class IMouseClickHandler : public Standard_Transient
     IMouseClickHandler &operator=(const IMouseClickHandler &) = default;
     IMouseClickHandler &operator=(IMouseClickHandler &&) = default;
 
-    virtual ~IMouseClickHandler() = default;
+    ~IMouseClickHandler() override = default;
 
     /**
      * @brief Returns true if given handler has some action to perform for given input. This method should be

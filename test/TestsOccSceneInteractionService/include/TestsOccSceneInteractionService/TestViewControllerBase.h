@@ -24,11 +24,20 @@ class TestViewControllerBase : public testing::Test
 
     Handle(AIS_InteractiveContext) getContext() const { return m_interactiveContext; }
 
-  protected:
+    Handle(testing::StrictMock<MockCameraListener>) getMockCameraListener() const { return m_pMockCameraListener; }
+
+    Handle(testing::StrictMock<MockMouseClickHandler>) getMockMouseClickHandler() const
+    {
+        return m_pMockMouseClickHandler;
+    }
+
+    osis::ViewController &getViewController() { return m_aisViewController; }
+
+  private:
+    osis::ViewController m_aisViewController;
+
     Handle(V3d_View) m_view;
     Handle(AIS_InteractiveContext) m_interactiveContext;
-
-    osis::ViewController m_aisViewController;
     Handle(testing::StrictMock<MockCameraListener>)
         m_pMockCameraListener = new testing::StrictMock<MockCameraListener>();
     Handle(testing::StrictMock<MockMouseClickHandler>)

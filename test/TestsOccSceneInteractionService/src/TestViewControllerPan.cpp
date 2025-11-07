@@ -24,10 +24,10 @@ class TestViewControllerPan : public TestViewControllerBase
  */
 TEST_F(TestViewControllerPan, input_panStart)
 {
-    auto &&guiInputBuffer = m_aisViewController.InputBuffer(AIS_ViewInputBufferType_UI);
-    auto &&renderInputBuffer = m_aisViewController.InputBuffer(AIS_ViewInputBufferType_GL);
+    auto &&guiInputBuffer = getViewController().InputBuffer(AIS_ViewInputBufferType_UI);
+    auto &&renderInputBuffer = getViewController().InputBuffer(AIS_ViewInputBufferType_GL);
 
-    const auto needToUpdate = m_aisViewController.UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton,
+    const auto needToUpdate = getViewController().UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton,
                                                                      Aspect_VKeyFlags_SHIFT, false);
 
     EXPECT_TRUE(needToUpdate);
@@ -35,7 +35,7 @@ TEST_F(TestViewControllerPan, input_panStart)
     EXPECT_FALSE(guiInputBuffer.Panning.ToPan);
     EXPECT_FALSE(guiInputBuffer.Panning.ToStart);
 
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
     EXPECT_TRUE(renderInputBuffer.IsNewGesture);
     EXPECT_FALSE(renderInputBuffer.Panning.ToPan);
     EXPECT_FALSE(renderInputBuffer.Panning.ToStart);
@@ -48,11 +48,11 @@ TEST_F(TestViewControllerPan, input_pan_sameFrame)
 {
     const auto delta = Graphic3d_Vec2i{10, 10};
 
-    auto &&guiInputBuffer = m_aisViewController.InputBuffer(AIS_ViewInputBufferType_UI);
-    auto &&renderInputBuffer = m_aisViewController.InputBuffer(AIS_ViewInputBufferType_GL);
+    auto &&guiInputBuffer = getViewController().InputBuffer(AIS_ViewInputBufferType_UI);
+    auto &&renderInputBuffer = getViewController().InputBuffer(AIS_ViewInputBufferType_GL);
 
-    m_aisViewController.UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false);
-    const auto needToUpdate = m_aisViewController.UpdateMousePosition(
+    getViewController().UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false);
+    const auto needToUpdate = getViewController().UpdateMousePosition(
         m_defaultPoint + delta, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false);
 
     EXPECT_TRUE(needToUpdate);
@@ -63,7 +63,7 @@ TEST_F(TestViewControllerPan, input_pan_sameFrame)
     EXPECT_EQ(guiInputBuffer.Panning.Delta.x(), delta.x());
     EXPECT_EQ(guiInputBuffer.Panning.Delta.y(), -delta.y());
 
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
     EXPECT_TRUE(renderInputBuffer.IsNewGesture);
     EXPECT_TRUE(renderInputBuffer.Panning.ToPan);
     EXPECT_TRUE(renderInputBuffer.Panning.ToStart);
@@ -79,13 +79,13 @@ TEST_F(TestViewControllerPan, input_pan_differentFrames)
 {
     const auto delta = Graphic3d_Vec2i{10, 10};
 
-    auto &&guiInputBuffer = m_aisViewController.InputBuffer(AIS_ViewInputBufferType_UI);
-    auto &&renderInputBuffer = m_aisViewController.InputBuffer(AIS_ViewInputBufferType_GL);
+    auto &&guiInputBuffer = getViewController().InputBuffer(AIS_ViewInputBufferType_UI);
+    auto &&renderInputBuffer = getViewController().InputBuffer(AIS_ViewInputBufferType_GL);
 
-    m_aisViewController.UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false);
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+    getViewController().UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
 
-    const auto needToUpdate = m_aisViewController.UpdateMousePosition(
+    const auto needToUpdate = getViewController().UpdateMousePosition(
         m_defaultPoint + delta, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false);
 
     EXPECT_TRUE(needToUpdate);
@@ -96,7 +96,7 @@ TEST_F(TestViewControllerPan, input_pan_differentFrames)
     EXPECT_EQ(guiInputBuffer.Panning.Delta.x(), delta.x());
     EXPECT_EQ(guiInputBuffer.Panning.Delta.y(), -delta.y());
 
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
     EXPECT_FALSE(renderInputBuffer.IsNewGesture);
     EXPECT_TRUE(renderInputBuffer.Panning.ToPan);
     EXPECT_TRUE(renderInputBuffer.Panning.ToStart);
@@ -112,13 +112,13 @@ TEST_F(TestViewControllerPan, input_panDisallowed)
 {
     const auto delta = Graphic3d_Vec2i{10, 10};
 
-    m_aisViewController.SetAllowPanning(false);
+    getViewController().SetAllowPanning(false);
 
-    auto &&guiInputBuffer = m_aisViewController.InputBuffer(AIS_ViewInputBufferType_UI);
-    auto &&renderInputBuffer = m_aisViewController.InputBuffer(AIS_ViewInputBufferType_GL);
+    auto &&guiInputBuffer = getViewController().InputBuffer(AIS_ViewInputBufferType_UI);
+    auto &&renderInputBuffer = getViewController().InputBuffer(AIS_ViewInputBufferType_GL);
 
-    m_aisViewController.UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false);
-    const auto needToUpdate = m_aisViewController.UpdateMousePosition(
+    getViewController().UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false);
+    const auto needToUpdate = getViewController().UpdateMousePosition(
         m_defaultPoint + delta, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false);
 
     EXPECT_FALSE(needToUpdate);
@@ -126,7 +126,7 @@ TEST_F(TestViewControllerPan, input_panDisallowed)
     EXPECT_FALSE(guiInputBuffer.Panning.ToPan);
     EXPECT_FALSE(guiInputBuffer.Panning.ToStart);
 
-    m_aisViewController.FlushViewEvents(getContext(), getView());
+    getViewController().FlushViewEvents(getContext(), getView());
     EXPECT_FALSE(renderInputBuffer.IsNewGesture);
     EXPECT_FALSE(renderInputBuffer.Panning.ToPan);
     EXPECT_FALSE(renderInputBuffer.Panning.ToStart);
@@ -140,16 +140,16 @@ TEST_F(TestViewControllerPan, input_panTwice_differentFrames)
     const auto delta1 = Graphic3d_Vec2i{10, 10};
     const auto delta2 = Graphic3d_Vec2i{15, 30};
 
-    auto &&guiInputBuffer = m_aisViewController.InputBuffer(AIS_ViewInputBufferType_UI);
-    auto &&renderInputBuffer = m_aisViewController.InputBuffer(AIS_ViewInputBufferType_GL);
+    auto &&guiInputBuffer = getViewController().InputBuffer(AIS_ViewInputBufferType_UI);
+    auto &&renderInputBuffer = getViewController().InputBuffer(AIS_ViewInputBufferType_GL);
 
-    m_aisViewController.UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false);
-    m_aisViewController.UpdateMousePosition(m_defaultPoint + delta1, Aspect_VKeyMouse_LeftButton,
+    getViewController().UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false);
+    getViewController().UpdateMousePosition(m_defaultPoint + delta1, Aspect_VKeyMouse_LeftButton,
                                             Aspect_VKeyFlags_SHIFT, false);
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
-    m_aisViewController.HandleViewEvents(getContext(), getView());
+    getViewController().FlushViewEvents(getContext(), getView(), false);
+    getViewController().HandleViewEvents(getContext(), getView());
 
-    const auto needToUpdate = m_aisViewController.UpdateMousePosition(
+    const auto needToUpdate = getViewController().UpdateMousePosition(
         m_defaultPoint + delta2, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false);
 
     EXPECT_TRUE(needToUpdate);
@@ -160,7 +160,7 @@ TEST_F(TestViewControllerPan, input_panTwice_differentFrames)
     EXPECT_EQ(guiInputBuffer.Panning.Delta.x(), delta2.x() - delta1.x());
     EXPECT_EQ(guiInputBuffer.Panning.Delta.y(), -delta2.y() + delta1.y());
 
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
     EXPECT_FALSE(renderInputBuffer.IsNewGesture);
     EXPECT_TRUE(renderInputBuffer.Panning.ToPan);
     EXPECT_FALSE(renderInputBuffer.Panning.ToStart);
@@ -181,17 +181,17 @@ TEST_F(TestViewControllerPan, event_panDisallowed_noNotify)
 {
     const auto delta = Graphic3d_Vec2i{10, 10};
 
-    m_aisViewController.SetAllowPanning(false);
-    m_aisViewController.setCameraListener(m_pMockCameraListener);
+    getViewController().SetAllowPanning(false);
+    getViewController().setCameraListener(getMockCameraListener());
 
-    m_aisViewController.UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false);
-    m_aisViewController.UpdateMousePosition(m_defaultPoint + delta, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT,
+    getViewController().UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false);
+    getViewController().UpdateMousePosition(m_defaultPoint + delta, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT,
                                             false);
 
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
 
-    EXPECT_CALL(*m_pMockCameraListener, onCameraCenterChanged(_)).Times(0);
-    m_aisViewController.HandleViewEvents(getContext(), getView());
+    EXPECT_CALL(*getMockCameraListener(), onCameraCenterChanged(_)).Times(0);
+    getViewController().HandleViewEvents(getContext(), getView());
 }
 
 /**
@@ -202,17 +202,17 @@ TEST_F(TestViewControllerPan, event_pan_sameFrame)
 {
     const auto delta = Graphic3d_Vec2i{10, 10};
 
-    m_aisViewController.setCameraListener(m_pMockCameraListener);
+    getViewController().setCameraListener(getMockCameraListener());
 
-    m_aisViewController.UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false);
-    m_aisViewController.UpdateMousePosition(m_defaultPoint + delta, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT,
+    getViewController().UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false);
+    getViewController().UpdateMousePosition(m_defaultPoint + delta, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT,
                                             false);
 
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
 
     gp_Pnt newCenter;
-    EXPECT_CALL(*m_pMockCameraListener, onCameraCenterChanged(_)).WillOnce(::testing::SaveArg<0>(&newCenter));
-    m_aisViewController.HandleViewEvents(getContext(), getView());
+    EXPECT_CALL(*getMockCameraListener(), onCameraCenterChanged(_)).WillOnce(::testing::SaveArg<0>(&newCenter));
+    getViewController().HandleViewEvents(getContext(), getView());
 
     EXPECT_TRUE(newCenter.IsEqual(getView()->Camera()->Center(), 1e-7));
 }
@@ -225,19 +225,19 @@ TEST_F(TestViewControllerPan, event_pan_differentFrames)
 {
     const auto delta = Graphic3d_Vec2i{10, 10};
 
-    m_aisViewController.setCameraListener(m_pMockCameraListener);
+    getViewController().setCameraListener(getMockCameraListener());
 
-    m_aisViewController.UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false);
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
-    m_aisViewController.HandleViewEvents(getContext(), getView());
+    getViewController().UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
+    getViewController().HandleViewEvents(getContext(), getView());
 
-    m_aisViewController.UpdateMousePosition(m_defaultPoint + delta, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT,
+    getViewController().UpdateMousePosition(m_defaultPoint + delta, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT,
                                             false);
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
 
     gp_Pnt newCenter;
-    EXPECT_CALL(*m_pMockCameraListener, onCameraCenterChanged(_)).WillOnce(::testing::SaveArg<0>(&newCenter));
-    m_aisViewController.HandleViewEvents(getContext(), getView());
+    EXPECT_CALL(*getMockCameraListener(), onCameraCenterChanged(_)).WillOnce(::testing::SaveArg<0>(&newCenter));
+    getViewController().HandleViewEvents(getContext(), getView());
 
     EXPECT_TRUE(newCenter.IsEqual(getView()->Camera()->Center(), 1e-7));
 }
@@ -251,21 +251,21 @@ TEST_F(TestViewControllerPan, event_panTwice_oneCallback)
     const auto delta1 = Graphic3d_Vec2i{10, 10};
     const auto delta2 = Graphic3d_Vec2i{20, 20};
 
-    m_aisViewController.setCameraListener(m_pMockCameraListener);
+    getViewController().setCameraListener(getMockCameraListener());
 
-    m_aisViewController.UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false);
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
-    m_aisViewController.HandleViewEvents(getContext(), getView());
+    getViewController().UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
+    getViewController().HandleViewEvents(getContext(), getView());
 
-    m_aisViewController.UpdateMousePosition(m_defaultPoint + delta1, Aspect_VKeyMouse_LeftButton,
+    getViewController().UpdateMousePosition(m_defaultPoint + delta1, Aspect_VKeyMouse_LeftButton,
                                             Aspect_VKeyFlags_SHIFT, false);
-    m_aisViewController.UpdateMousePosition(m_defaultPoint + delta2, Aspect_VKeyMouse_LeftButton,
+    getViewController().UpdateMousePosition(m_defaultPoint + delta2, Aspect_VKeyMouse_LeftButton,
                                             Aspect_VKeyFlags_SHIFT, false);
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
 
     gp_Pnt newCenter;
-    EXPECT_CALL(*m_pMockCameraListener, onCameraCenterChanged(_)).WillOnce(::testing::SaveArg<0>(&newCenter));
-    m_aisViewController.HandleViewEvents(getContext(), getView());
+    EXPECT_CALL(*getMockCameraListener(), onCameraCenterChanged(_)).WillOnce(::testing::SaveArg<0>(&newCenter));
+    getViewController().HandleViewEvents(getContext(), getView());
 
     EXPECT_TRUE(newCenter.IsEqual(getView()->Camera()->Center(), 1e-7));
 }
@@ -279,28 +279,28 @@ TEST_F(TestViewControllerPan, event_panTwice_differentFrames)
     const auto delta1 = Graphic3d_Vec2i{10, 10};
     const auto delta2 = Graphic3d_Vec2i{20, 20};
 
-    m_aisViewController.setCameraListener(m_pMockCameraListener);
+    getViewController().setCameraListener(getMockCameraListener());
 
-    m_aisViewController.UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false);
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
-    m_aisViewController.HandleViewEvents(getContext(), getView());
+    getViewController().UpdateMouseButtons(m_defaultPoint, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
+    getViewController().HandleViewEvents(getContext(), getView());
 
-    m_aisViewController.UpdateMousePosition(m_defaultPoint + delta1, Aspect_VKeyMouse_LeftButton,
+    getViewController().UpdateMousePosition(m_defaultPoint + delta1, Aspect_VKeyMouse_LeftButton,
                                             Aspect_VKeyFlags_SHIFT, false);
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
 
     gp_Pnt newCenter;
-    EXPECT_CALL(*m_pMockCameraListener, onCameraCenterChanged(_)).WillOnce(::testing::SaveArg<0>(&newCenter));
-    m_aisViewController.HandleViewEvents(getContext(), getView());
+    EXPECT_CALL(*getMockCameraListener(), onCameraCenterChanged(_)).WillOnce(::testing::SaveArg<0>(&newCenter));
+    getViewController().HandleViewEvents(getContext(), getView());
 
     EXPECT_TRUE(newCenter.IsEqual(getView()->Camera()->Center(), 1e-7));
 
-    m_aisViewController.UpdateMousePosition(m_defaultPoint + delta2, Aspect_VKeyMouse_LeftButton,
+    getViewController().UpdateMousePosition(m_defaultPoint + delta2, Aspect_VKeyMouse_LeftButton,
                                             Aspect_VKeyFlags_SHIFT, false);
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
 
-    EXPECT_CALL(*m_pMockCameraListener, onCameraCenterChanged(_)).WillOnce(::testing::SaveArg<0>(&newCenter));
-    m_aisViewController.HandleViewEvents(getContext(), getView());
+    EXPECT_CALL(*getMockCameraListener(), onCameraCenterChanged(_)).WillOnce(::testing::SaveArg<0>(&newCenter));
+    getViewController().HandleViewEvents(getContext(), getView());
 
     EXPECT_TRUE(newCenter.IsEqual(getView()->Camera()->Center(), 1e-7));
 }

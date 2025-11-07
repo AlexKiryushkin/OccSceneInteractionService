@@ -10,11 +10,6 @@
 namespace osis
 {
 
-ViewController::ViewController()
-    : AIS_ViewController{}
-{
-}
-
 void ViewController::setCameraListener(Handle(ICameraListener) pCameraListener)
 {
     m_pCameraListenerSyncObject.setUiData(std::move(pCameraListener));

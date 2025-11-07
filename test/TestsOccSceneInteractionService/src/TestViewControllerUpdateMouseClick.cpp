@@ -7,10 +7,7 @@ namespace osis::test
 class TestViewControllerUpdateMouseClick : public TestViewControllerBase
 {
   protected:
-    TestViewControllerUpdateMouseClick()
-        : TestViewControllerBase{}
-    {
-    }
+    TestViewControllerUpdateMouseClick() = default;
 };
 
 /**
@@ -20,10 +17,10 @@ TEST_F(TestViewControllerUpdateMouseClick, updateMouseClick_noHandler)
 {
     const auto point = Graphic3d_Vec2i{100, 200};
 
-    m_aisViewController.UpdateMouseClick(point, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false);
+    getViewController().UpdateMouseClick(point, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false);
 
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
-    m_aisViewController.HandleViewEvents(getContext(), getView());
+    getViewController().FlushViewEvents(getContext(), getView(), false);
+    getViewController().HandleViewEvents(getContext(), getView());
 }
 
 /**
@@ -34,15 +31,15 @@ TEST_F(TestViewControllerUpdateMouseClick, updateMouseClick_updateViewNoHandler)
     const auto point = Graphic3d_Vec2i{100, 200};
 
     auto toUpdateView =
-        m_aisViewController.UpdateMouseClick(point, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_NONE, false);
+        getViewController().UpdateMouseClick(point, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_NONE, false);
     EXPECT_TRUE(toUpdateView);
 
     toUpdateView =
-        m_aisViewController.UpdateMouseClick(point, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false);
+        getViewController().UpdateMouseClick(point, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false);
     EXPECT_TRUE(toUpdateView);
 
     toUpdateView =
-        m_aisViewController.UpdateMouseClick(point, Aspect_VKeyMouse_RightButton, Aspect_VKeyFlags_NONE, false);
+        getViewController().UpdateMouseClick(point, Aspect_VKeyMouse_RightButton, Aspect_VKeyFlags_NONE, false);
     EXPECT_FALSE(toUpdateView);
 }
 
@@ -52,7 +49,7 @@ TEST_F(TestViewControllerUpdateMouseClick, updateMouseClick_callbackActsOn_callb
     const auto point2 = Graphic3d_Vec2i{110, 210};
     const auto point3 = Graphic3d_Vec2i{120, 220};
 
-    m_aisViewController.setMouseClickHandler(m_pMockMouseClickHandler);
+    getViewController().setMouseClickHandler(getMockMouseClickHandler());
 
     std::vector<std::tuple<Graphic3d_Vec2i, Aspect_VKeyMouse, Aspect_VKeyFlags, bool>> testData{
         std::make_tuple(point1, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false),
@@ -61,16 +58,16 @@ TEST_F(TestViewControllerUpdateMouseClick, updateMouseClick_callbackActsOn_callb
 
     for(auto [point, button, modifiers, isDoubleClick] : testData)
     {
-        m_aisViewController.ResetViewInput();
+        getViewController().ResetViewInput();
 
-        EXPECT_CALL(*m_pMockMouseClickHandler, actsOn(button, modifiers, isDoubleClick))
+        EXPECT_CALL(*getMockMouseClickHandler(), actsOn(button, modifiers, isDoubleClick))
             .WillOnce(::testing::Return(true));
-        m_aisViewController.UpdateMouseClick(point, button, modifiers, isDoubleClick);
+        getViewController().UpdateMouseClick(point, button, modifiers, isDoubleClick);
 
-        m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+        getViewController().FlushViewEvents(getContext(), getView(), false);
 
-        EXPECT_CALL(*m_pMockMouseClickHandler, handleMouseClicked(point, button, modifiers, isDoubleClick));
-        m_aisViewController.HandleViewEvents(getContext(), getView());
+        EXPECT_CALL(*getMockMouseClickHandler(), handleMouseClicked(point, button, modifiers, isDoubleClick));
+        getViewController().HandleViewEvents(getContext(), getView());
     }
 }
 
@@ -80,7 +77,7 @@ TEST_F(TestViewControllerUpdateMouseClick, updateMouseClick_callbackDoesNotActOn
     const auto point2 = Graphic3d_Vec2i{110, 210};
     const auto point3 = Graphic3d_Vec2i{120, 220};
 
-    m_aisViewController.setMouseClickHandler(m_pMockMouseClickHandler);
+    getViewController().setMouseClickHandler(getMockMouseClickHandler());
 
     std::vector<std::tuple<Graphic3d_Vec2i, Aspect_VKeyMouse, Aspect_VKeyFlags, bool>> testData{
         std::make_tuple(point1, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false),
@@ -89,16 +86,16 @@ TEST_F(TestViewControllerUpdateMouseClick, updateMouseClick_callbackDoesNotActOn
 
     for(auto [point, button, modifiers, isDoubleClick] : testData)
     {
-        m_aisViewController.ResetViewInput();
+        getViewController().ResetViewInput();
 
-        EXPECT_CALL(*m_pMockMouseClickHandler, actsOn(button, modifiers, isDoubleClick))
+        EXPECT_CALL(*getMockMouseClickHandler(), actsOn(button, modifiers, isDoubleClick))
             .WillOnce(::testing::Return(false));
-        m_aisViewController.UpdateMouseClick(point, button, modifiers, isDoubleClick);
+        getViewController().UpdateMouseClick(point, button, modifiers, isDoubleClick);
 
-        m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+        getViewController().FlushViewEvents(getContext(), getView(), false);
 
-        EXPECT_CALL(*m_pMockMouseClickHandler, handleMouseClicked(point, button, modifiers, isDoubleClick)).Times(0);
-        m_aisViewController.HandleViewEvents(getContext(), getView());
+        EXPECT_CALL(*getMockMouseClickHandler(), handleMouseClicked(point, button, modifiers, isDoubleClick)).Times(0);
+        getViewController().HandleViewEvents(getContext(), getView());
     }
 }
 
@@ -108,14 +105,14 @@ TEST_F(TestViewControllerUpdateMouseClick, updateMouseClick_updateViewWithHandle
     const auto button = Aspect_VKeyMouse_RightButton;
     const auto modifier = Aspect_VKeyFlags_SHIFT;
 
-    m_aisViewController.setMouseClickHandler(m_pMockMouseClickHandler);
+    getViewController().setMouseClickHandler(getMockMouseClickHandler());
 
-    EXPECT_CALL(*m_pMockMouseClickHandler, actsOn(button, modifier, false)).WillOnce(::testing::Return(true));
-    auto toUpdateView = m_aisViewController.UpdateMouseClick(point, button, modifier, false);
+    EXPECT_CALL(*getMockMouseClickHandler(), actsOn(button, modifier, false)).WillOnce(::testing::Return(true));
+    auto toUpdateView = getViewController().UpdateMouseClick(point, button, modifier, false);
     EXPECT_TRUE(toUpdateView);
 
-    EXPECT_CALL(*m_pMockMouseClickHandler, actsOn(button, modifier, false)).WillOnce(::testing::Return(false));
-    toUpdateView = m_aisViewController.UpdateMouseClick(point, button, modifier, false);
+    EXPECT_CALL(*getMockMouseClickHandler(), actsOn(button, modifier, false)).WillOnce(::testing::Return(false));
+    toUpdateView = getViewController().UpdateMouseClick(point, button, modifier, false);
     EXPECT_FALSE(toUpdateView);
 }
 
@@ -123,26 +120,26 @@ TEST_F(TestViewControllerUpdateMouseClick, updateMouseClick_callbackIsCalledOnly
 {
     const auto point = Graphic3d_Vec2i{100, 200};
 
-    m_aisViewController.setMouseClickHandler(m_pMockMouseClickHandler);
+    getViewController().setMouseClickHandler(getMockMouseClickHandler());
 
-    EXPECT_CALL(*m_pMockMouseClickHandler, actsOn(Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false))
+    EXPECT_CALL(*getMockMouseClickHandler(), actsOn(Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false))
         .WillOnce(::testing::Return(true));
-    m_aisViewController.UpdateMouseClick(point, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false);
+    getViewController().UpdateMouseClick(point, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false);
 
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
+    getViewController().FlushViewEvents(getContext(), getView(), false);
 
-    EXPECT_CALL(*m_pMockMouseClickHandler,
+    EXPECT_CALL(*getMockMouseClickHandler(),
                 handleMouseClicked(point, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false));
-    m_aisViewController.HandleViewEvents(getContext(), getView());
+    getViewController().HandleViewEvents(getContext(), getView());
 
-    EXPECT_CALL(*m_pMockMouseClickHandler,
+    EXPECT_CALL(*getMockMouseClickHandler(),
                 handleMouseClicked(point, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_SHIFT, false))
         .Times(0ULL);
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
-    m_aisViewController.HandleViewEvents(getContext(), getView());
+    getViewController().FlushViewEvents(getContext(), getView(), false);
+    getViewController().HandleViewEvents(getContext(), getView());
 
-    m_aisViewController.FlushViewEvents(getContext(), getView(), false);
-    m_aisViewController.HandleViewEvents(getContext(), getView());
+    getViewController().FlushViewEvents(getContext(), getView(), false);
+    getViewController().HandleViewEvents(getContext(), getView());
 }
 
 } // namespace osis::test
