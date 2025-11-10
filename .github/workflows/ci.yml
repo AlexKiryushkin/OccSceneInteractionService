@@ -143,10 +143,10 @@ jobs:
         working-directory: build
         run: |
           & "C:\Program Files\OpenCppCoverage\OpenCppCoverage.exe" \
-          --modules ${{ github.workspace }}\build\test\TestsOccSceneInteractionService\Debug\TestsOccSceneInteractionService.exe \
-          --sources ${{ github.workspace }}\src \
-          --export_type=cobertura:coverage.xml \
-          -- ${{ github.workspace }}\build\test\TestsOccSceneInteractionService\Debug\TestsOccSceneInteractionService.exe
+            --modules ${{ github.workspace }}\build\test\TestsOccSceneInteractionService\Debug\TestsOccSceneInteractionService.exe \
+            --sources ${{ github.workspace }}\src \
+            --export_type=cobertura:coverage.xml \
+            -- ${{ github.workspace }}\build\test\TestsOccSceneInteractionService\Debug\TestsOccSceneInteractionService.exe
       
       - name: Upload coverage to Codacy
         uses: codacy/codacy-coverage-reporter-action@v1
