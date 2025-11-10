@@ -43,7 +43,7 @@ runs:
         uses: actions/cache@v4
         with:
           path: ~/.conan2
-          key: conan-${{ inputs.os }}-${{ hashFiles('conanfile.*') }}
+          key: ${{ inputs.build-type }} == Release && conan-${{ inputs.os }}-${{ hashFiles('conanfile.*') }} || conan-${{ inputs.os }}-${{ hashFiles('conanfile.*') }}-${{ inputs.build-type }}
           restore-keys: |
             conan-${{ inputs.os }}-
 
@@ -55,7 +55,7 @@ runs:
       - name: Install dependencies
         shell: bash
         run: |
-          conan install . --output-folder=build --build=missing -c tools.system.package_manager:mode=install -c tools.system.package_manager:sudo=True
+          conan install . --output-folder=build --build=missing -c tools.system.package_manager:mode=install -c tools.system.package_manager:sudo=True -s build_type=${{ inputs.build-type }} 
 
       - name: Configure
         shell: bash
