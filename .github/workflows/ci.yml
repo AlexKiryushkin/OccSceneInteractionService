@@ -60,7 +60,7 @@ jobs:
         working-directory: build
         run: |
           cmake --build . --target package --config ${{ matrix.config.build_type }}
-          
+
       - name: Upload Archive Artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -105,3 +105,57 @@ jobs:
           ignore: build/*
           tidy-review: true
           step-summary: true
+
+  code-coverage:
+    name: Code coverage
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Cache OpenCppCoverage packages.
+        uses: actions/cache@v4
+        id: OpenCppCoverageCache
+        with:
+          path: "C:\\Program Files\\OpenCppCoverage"
+          key: OpenCppCoverage-Windows-Debug
+          restore-keys: OpenCppCoverage-Windows-
+              
+      - name: Install code coverage tool
+        shell: pwsh
+        if: steps.OpenCppCoverageCache.outputs.cache-hit != 'true'
+        run: |
+          choco install opencppcoverage -y
+
+      - name: Configure Project
+        uses: ./.github/actions/configure-project
+        with:
+          build-type: Debug
+          os: ${{ runner.os }}
+
+      - name: Build
+        working-directory: build
+        run: |
+          cmake --build . --config Debug
+
+      - name: Run code coverage
+        working-directory: build
+        run: |
+          & "C:\Program Files\OpenCppCoverage\OpenCppCoverage.exe" \
+          --modules ${{ github.workspace }}\build\test\TestsOccSceneInteractionService\Debug\TestsOccSceneInteractionService.exe \
+          --sources ${{ github.workspace }}\src \
+          --export_type=cobertura:coverage.xml \
+          -- ${{ github.workspace }}\build\test\TestsOccSceneInteractionService\Debug\TestsOccSceneInteractionService.exe
+      
+      - name: Upload coverage to Codacy
+        uses: codacy/codacy-coverage-reporter-action@v1
+        with:
+          api-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          coverage-reports: build/coverage.xml
+          
+      - name: Upload Code Coverage Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage.xml
+          path: ${{ github.workspace }}/build/coverage.xml
