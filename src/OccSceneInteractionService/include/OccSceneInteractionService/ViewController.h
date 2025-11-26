@@ -36,7 +36,7 @@ class ViewController : public AIS_ViewController
      * @brief Sets owner hover listener. Can be NULL, if no owner hover listener is needed. Is called from UI thread.
      * @param pOwnerHoverListener owner hover listener.
      */
-    void setOwnerHoverListenerr(Handle(IOwnerHoverListener) pOwnerHoverListener);
+    void setOwnerHoverListener(Handle(IOwnerHoverListener) pOwnerHoverListener);
 
   public: //! @name public overridden methods
     /**
