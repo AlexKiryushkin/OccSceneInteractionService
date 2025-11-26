@@ -18,7 +18,7 @@ class TestOwnerHoverListener : public TestViewControllerBase
     static Handle(AIS_Shape) makeAisBox(const gp_Pnt &startPoint = gp_Pnt{})
     {
         auto shape = BRepPrimAPI_MakeBox{startPoint, 1.0, 1.0, 1.0};
-        return new AIS_Shape(shape);
+        return Handle(AIS_Shape){new AIS_Shape(shape)};
     }
 };
 
