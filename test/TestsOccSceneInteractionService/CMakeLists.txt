@@ -22,11 +22,14 @@ add_executable(${TEST_EXECUTABLE_NAME})
 target_sources(${TEST_EXECUTABLE_NAME} 
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/include/TestsOccSceneInteractionService/MockCameraListener.h
+        ${CMAKE_CURRENT_LIST_DIR}/include/TestsOccSceneInteractionService/MockMouseClickHandler.h
+        ${CMAKE_CURRENT_LIST_DIR}/include/TestsOccSceneInteractionService/MockOwnerHoverListener.h
         ${CMAKE_CURRENT_LIST_DIR}/include/TestsOccSceneInteractionService/TestViewControllerBase.h)
 
 target_sources(${TEST_EXECUTABLE_NAME} 
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/src/main.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/TestOwnerHoverListener.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/TestRtti.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/TestUiRenderSyncObject.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/TestViewControllerAnimation.cpp
@@ -41,7 +44,7 @@ target_sources(${TEST_EXECUTABLE_NAME}
 # Find Packages
 # -------------------------------------------------------------------------------------------------
 find_package(GTest CONFIG REQUIRED)
-find_package(OpenCASCADE REQUIRED COMPONENTS ${OpenCASCADE_Visualization_LIBRARIES})
+find_package(OpenCASCADE REQUIRED)
 include(GoogleTest)
 
 
@@ -55,6 +58,7 @@ target_link_libraries(
             GTest::gtest_main
             GTest::gmock_main
             TKOpenGl
+            ${OpenCASCADE_LIBRARIES}
 )
 
 

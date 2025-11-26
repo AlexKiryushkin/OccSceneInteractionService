@@ -22,7 +22,7 @@ void ViewController::setMouseClickHandler(Handle(IMouseClickHandler) pMouseClick
     m_pMouseClickHandlerSyncObject.setUiData(std::move(pMouseClickHandler));
 }
 
-void ViewController::setOwnerHoverListenerr(Handle(IOwnerHoverListener) pOwnerHoverListener)
+void ViewController::setOwnerHoverListener(Handle(IOwnerHoverListener) pOwnerHoverListener)
 {
     m_pOwnerHoverListenerSyncObject.setUiData(std::move(pOwnerHoverListener));
 }

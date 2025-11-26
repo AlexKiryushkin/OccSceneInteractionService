@@ -4,6 +4,7 @@
 
 #include "TestsOccSceneInteractionService/MockCameraListener.h"
 #include "TestsOccSceneInteractionService/MockMouseClickHandler.h"
+#include "TestsOccSceneInteractionService/MockOwnerHoverListener.h"
 
 #include <OccSceneInteractionService/ViewController.h>
 
@@ -31,6 +32,11 @@ class TestViewControllerBase : public testing::Test
         return m_pMockMouseClickHandler;
     }
 
+    Handle(testing::StrictMock<MockOwnerHoverListener>) getMockOwnerHoverListener() const
+    {
+        return m_pMockOwnerHoverListener;
+    }
+
     osis::ViewController &getViewController() { return m_aisViewController; }
 
   private:
@@ -42,6 +48,8 @@ class TestViewControllerBase : public testing::Test
         m_pMockCameraListener = new testing::StrictMock<MockCameraListener>();
     Handle(testing::StrictMock<MockMouseClickHandler>)
         m_pMockMouseClickHandler = new testing::StrictMock<MockMouseClickHandler>();
+    Handle(testing::StrictMock<MockOwnerHoverListener>)
+        m_pMockOwnerHoverListener = new testing::StrictMock<MockOwnerHoverListener>();
 };
 
 } // namespace osis::test
