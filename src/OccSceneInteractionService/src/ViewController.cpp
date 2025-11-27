@@ -68,11 +68,13 @@ void ViewController::HandleViewEvents(const Handle(AIS_InteractiveContext) & pCo
         m_mouseClickDataSyncObject.resetRenderData();
     }
 
-    if(auto pMouseHoverListener = m_pMouseHoverListenerSyncObject.getRenderData();
-       pMouseHoverListener && m_mouseHoverPosition.getRenderData().has_value())
+    if(auto pMouseHoverListener = m_pMouseHoverListenerSyncObject.getRenderData(); pMouseHoverListener)
     {
-        pMouseHoverListener->onHover(*m_mouseHoverPosition.getRenderData());
-        m_mouseHoverPosition.resetRenderData();
+        if (auto mouseHoverPosition = m_mouseHoverPositionSyncObject.getRenderData(); mouseHoverPosition.has_value())
+        {
+            pMouseHoverListener->onHover(*mouseHoverPosition);
+            m_mouseHoverPositionSyncObject.resetRenderData();
+        }
     }
 }
 
@@ -99,7 +101,7 @@ bool ViewController::UpdateMousePosition(const Graphic3d_Vec2i &point, Aspect_VK
 
     if(buttons == Aspect_VKeyMouse_NONE)
     {
-        m_mouseHoverPosition.setUiData(point);
+        m_mouseHoverPositionSyncObject.setUiData(point);
         if(m_pMouseHoverListenerSyncObject.getUiData())
         {
             toUpdateView = true;
@@ -120,7 +122,7 @@ void ViewController::flushBuffers(const Handle(AIS_InteractiveContext) & pContex
     m_pOwnerHoverListenerSyncObject.sync();
 
     m_pMouseHoverListenerSyncObject.sync();
-    m_mouseHoverPosition.sync();
+    m_mouseHoverPositionSyncObject.sync();
 }
 
 void ViewController::handlePanning(const Handle(V3d_View) & view)

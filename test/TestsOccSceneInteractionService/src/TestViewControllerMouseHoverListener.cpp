@@ -8,12 +8,13 @@ using ::testing::_;
 
 class TestViewControllerMouseHoverListener : public TestViewControllerBase
 {
+  protected:
+    Graphic3d_Vec2i m_defaultPoint{100, 200};
 };
 
 TEST_F(TestViewControllerMouseHoverListener, updateMousePosition_noHandler)
 {
-    getViewController().UpdateMousePosition(Graphic3d_Vec2i{100, 200}, Aspect_VKeyMouse_NONE, Aspect_VKeyFlags_NONE,
-                                            false);
+    getViewController().UpdateMousePosition(m_defaultPoint, Aspect_VKeyMouse_NONE, Aspect_VKeyFlags_NONE, false);
 
     // just check that we don't crash if we don't have a mouse click handler
     getViewController().FlushViewEvents(getContext(), getView(), false);
@@ -48,13 +49,12 @@ TEST_F(TestViewControllerMouseHoverListener, updateMousePosition_callbackIsCalle
 
 TEST_F(TestViewControllerMouseHoverListener, updateMousePositionMoveToDisallowed_returnsTrueForListener)
 {
-    const auto point = Graphic3d_Vec2i{100, 200};
-
     getViewController().setMouseHoverListener(getMockMouseHoverListener());
 
     getViewController().SetAllowHighlight(false);
 
-    const auto toUpdateView = getViewController().UpdateMousePosition(point, Aspect_VKeyMouse_NONE, Aspect_VKeyFlags_SHIFT, false);
+    const auto toUpdateView =
+        getViewController().UpdateMousePosition(m_defaultPoint, Aspect_VKeyMouse_NONE, Aspect_VKeyFlags_SHIFT, false);
     EXPECT_TRUE(toUpdateView);
 }
 
@@ -64,11 +64,11 @@ TEST_F(TestViewControllerMouseHoverListener, updateMousePosition_callbackIsCalle
 
     getViewController().setMouseHoverListener(getMockMouseHoverListener());
 
-    getViewController().UpdateMousePosition(point, Aspect_VKeyMouse_NONE, Aspect_VKeyFlags_SHIFT, false);
+    getViewController().UpdateMousePosition(m_defaultPoint, Aspect_VKeyMouse_NONE, Aspect_VKeyFlags_SHIFT, false);
 
     getViewController().FlushViewEvents(getContext(), getView(), false);
 
-    EXPECT_CALL(*getMockMouseHoverListener(), onHover(point));
+    EXPECT_CALL(*getMockMouseHoverListener(), onHover(m_defaultPoint));
     getViewController().HandleViewEvents(getContext(), getView());
 
     EXPECT_CALL(*getMockMouseHoverListener(), onHover(_)).Times(0ULL);

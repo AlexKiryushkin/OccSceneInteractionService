@@ -126,7 +126,7 @@ class ViewController : public AIS_ViewController
     UiRenderSyncObject<Handle(IOwnerHoverListener)> m_pOwnerHoverListenerSyncObject;
 
     UiRenderSyncObject<Handle(IMouseHoverListener)> m_pMouseHoverListenerSyncObject;
-    UiRenderSyncObject<std::optional<Graphic3d_Vec2i>> m_mouseHoverPosition;
+    UiRenderSyncObject<std::optional<Graphic3d_Vec2i>> m_mouseHoverPositionSyncObject;
 };
 
 } // namespace osis
