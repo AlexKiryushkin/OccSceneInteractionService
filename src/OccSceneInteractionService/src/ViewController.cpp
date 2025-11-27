@@ -3,6 +3,7 @@
 
 #include "OccSceneInteractionService/ICameraListener.h"
 #include "OccSceneInteractionService/IMouseClickHandler.h"
+#include "OccSceneInteractionService/IMouseHoverListener.h"
 #include "OccSceneInteractionService/IOwnerHoverListener.h"
 
 #include <AIS_AnimationCamera.hxx>
@@ -25,6 +26,11 @@ void ViewController::setMouseClickHandler(Handle(IMouseClickHandler) pMouseClick
 void ViewController::setOwnerHoverListener(Handle(IOwnerHoverListener) pOwnerHoverListener)
 {
     m_pOwnerHoverListenerSyncObject.setUiData(std::move(pOwnerHoverListener));
+}
+
+void ViewController::setMouseHoverListener(Handle(IMouseHoverListener) pMouseHoverListener)
+{
+    m_pMouseHoverListenerSyncObject.setUiData(std::move(pMouseHoverListener));
 }
 
 void ViewController::HandleViewEvents(const Handle(AIS_InteractiveContext) & pContext, const Handle(V3d_View) & pView)
@@ -61,6 +67,13 @@ void ViewController::HandleViewEvents(const Handle(AIS_InteractiveContext) & pCo
 
         m_mouseClickDataSyncObject.resetRenderData();
     }
+
+    if(auto pMouseHoverListener = m_pMouseHoverListenerSyncObject.getRenderData();
+       pMouseHoverListener && m_mouseHoverPosition.getRenderData().has_value())
+    {
+        pMouseHoverListener->onHover(*m_mouseHoverPosition.getRenderData());
+        m_mouseHoverPosition.resetRenderData();
+    }
 }
 
 bool ViewController::UpdateMouseClick(const Graphic3d_Vec2i &point, Aspect_VKeyMouse button, Aspect_VKeyFlags modifiers,
@@ -78,6 +91,24 @@ bool ViewController::UpdateMouseClick(const Graphic3d_Vec2i &point, Aspect_VKeyM
     return toUpdateView;
 }
 
+bool ViewController::UpdateMousePosition(const Graphic3d_Vec2i &point, Aspect_VKeyMouse buttons,
+                                         Aspect_VKeyFlags modifiers, bool isEmulated)
+{
+
+    auto toUpdateView = AIS_ViewController::UpdateMousePosition(point, buttons, modifiers, isEmulated);
+
+    if(buttons == Aspect_VKeyMouse_NONE)
+    {
+        m_mouseHoverPosition.setUiData(point);
+        if(m_pMouseHoverListenerSyncObject.getUiData())
+        {
+            toUpdateView = true;
+        }
+    }
+
+    return toUpdateView;
+}
+
 void ViewController::flushBuffers(const Handle(AIS_InteractiveContext) & pContext, const Handle(V3d_View) & pView)
 {
     AIS_ViewController::flushBuffers(pContext, pView);
@@ -87,6 +118,9 @@ void ViewController::flushBuffers(const Handle(AIS_InteractiveContext) & pContex
     m_mouseClickDataSyncObject.sync();
 
     m_pOwnerHoverListenerSyncObject.sync();
+
+    m_pMouseHoverListenerSyncObject.sync();
+    m_mouseHoverPosition.sync();
 }
 
 void ViewController::handlePanning(const Handle(V3d_View) & view)

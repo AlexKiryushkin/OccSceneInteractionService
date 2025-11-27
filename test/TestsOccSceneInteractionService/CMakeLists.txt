@@ -34,6 +34,7 @@ target_sources(${TEST_EXECUTABLE_NAME}
         ${CMAKE_CURRENT_LIST_DIR}/src/TestUiRenderSyncObject.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/TestViewControllerAnimation.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/TestViewControllerBase.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/TestViewControllerMouseHoverListener.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/TestViewControllerMouseZoom.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/TestViewControllerPan.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/TestViewControllerRotation.cpp

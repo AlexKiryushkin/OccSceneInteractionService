@@ -6,13 +6,17 @@
 #include <OccSceneInteractionService/UiRenderSyncObject.h>
 
 #include <AIS_ViewController.hxx>
+#include <Graphic3d_Vec2.hxx>
 #include <Standard_Handle.hxx>
+
+#include <optional>
 
 namespace osis
 {
 
 class ICameraListener;
 class IMouseClickHandler;
+class IMouseHoverListener;
 class IOwnerHoverListener;
 
 class ViewController : public AIS_ViewController
@@ -38,14 +42,29 @@ class ViewController : public AIS_ViewController
      */
     void setOwnerHoverListener(Handle(IOwnerHoverListener) pOwnerHoverListener);
 
+    /**
+     * @brief Sets owner hover listener. Can be NULL, if no owner hover listener is needed. Is called from UI thread.
+     * @param pOwnerHoverListener owner hover listener.
+     */
+    void setMouseHoverListener(Handle(IMouseHoverListener) pMouseHoverListener);
+
   public: //! @name public overridden methods
     /**
      * @brief Overridden method of HandleViewEvents. Is called from Render thread.
      */
     void HandleViewEvents(const Handle(AIS_InteractiveContext) & pContext, const Handle(V3d_View) & pView) override;
-
+    
+    /**
+     * @brief Overridden method of UpdateMouseClick. Is called from UI thread.
+     */
     bool UpdateMouseClick(const Graphic3d_Vec2i &point, Aspect_VKeyMouse button, Aspect_VKeyFlags modifiers,
                           bool isDoubleClick) override;
+
+    /**
+     * @brief Overridden method of UpdateMousePosition. Is called from UI thread.
+     */
+    bool UpdateMousePosition(const Graphic3d_Vec2i &point, Aspect_VKeyMouse buttons, Aspect_VKeyFlags modifiers,
+                             bool isEmulated) override;
 
   protected: //! @name protected overridden methods
     /**
@@ -105,6 +124,9 @@ class ViewController : public AIS_ViewController
     UiRenderSyncObject<MouseClickData> m_mouseClickDataSyncObject;
 
     UiRenderSyncObject<Handle(IOwnerHoverListener)> m_pOwnerHoverListenerSyncObject;
+
+    UiRenderSyncObject<Handle(IMouseHoverListener)> m_pMouseHoverListenerSyncObject;
+    UiRenderSyncObject<std::optional<Graphic3d_Vec2i>> m_mouseHoverPosition;
 };
 
 } // namespace osis

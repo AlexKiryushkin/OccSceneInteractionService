@@ -45,6 +45,20 @@ TEST_F(TestViewControllerAnimation, onAnimationStarted)
 }
 
 /**
+ * @brief Checks that callback is not called if we call abort animation when there was no animation in progress
+ */
+TEST_F(TestViewControllerAnimation, noCallbackOnAbortAnimationWhenNoAnimation)
+{
+    getViewController().setCameraListener(getMockCameraListener());
+
+    EXPECT_CALL(*getMockCameraListener(), onAnimationStopped()).Times(0);
+    getViewController().AbortViewAnimation();
+
+    getViewController().FlushViewEvents(getContext(), getView(), false);
+    getViewController().HandleViewEvents(getContext(), getView());
+}
+
+/**
  * @brief Checks that the onAnimationStopped callback is called when animation stops. And not called on next frame.
  */
 TEST_F(TestViewControllerAnimation, onAnimationStopped)
