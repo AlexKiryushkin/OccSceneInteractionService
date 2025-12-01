@@ -1,5 +1,6 @@
 
 #include "TestsOccSceneInteractionService/MockCameraListener.h"
+#include "TestsOccSceneInteractionService/MockKeyHandler.h"
 #include "TestsOccSceneInteractionService/MockMouseClickHandler.h"
 #include "TestsOccSceneInteractionService/MockMouseHoverListener.h"
 #include "TestsOccSceneInteractionService/MockOwnerHoverListener.h"
@@ -45,6 +46,14 @@ TEST_F(TestRtti, IMouseHoverListener)
 
     // We do not add RTTI for MockMouseHoverListener, so this should be equal
     EXPECT_EQ(IMouseHoverListener::get_type_descriptor(), mockMouseHoverListener.DynamicType());
+}
+
+TEST_F(TestRtti, IKeyHandler)
+{
+    MockKeyHandler mocKeyHandler;
+
+    // We do not add RTTI for MockKeyHandler, so this should be equal
+    EXPECT_EQ(IKeyHandler::get_type_descriptor(), mocKeyHandler.DynamicType());
 }
 
 } // namespace osis::test
