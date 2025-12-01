@@ -21,7 +21,7 @@ class KeyboardListener
     /**
      * @brief user action on key: whether it was pressed or released
      */
-    enum class KeyAction
+    enum class KeyAction : std::uint8_t
     {
         Pressed,
         Released
@@ -40,13 +40,13 @@ class KeyboardListener
      * @brief Returns key states gathered in UI thread. Should be called in UI thread.
      * @return Key states gathered in UI thread.
      */
-    OSIS_API const std::vector<KeyState> &getUiKeyStates() const;
+    OSIS_API [[nodiscard]] const std::vector<KeyState> &getUiKeyStates() const;
 
     /**
      * @brief Returns key states in Render thread that were synced from UI thread. Should be called in Render thread.
      * @return Key states in Render thread that were synced from UI thread.
      */
-    OSIS_API const std::vector<KeyState> &getRenderKeyStates() const;
+    OSIS_API [[nodiscard]] const std::vector<KeyState> &getRenderKeyStates() const;
 
     /**
      * @brief Handling of a key press event. Should be called in UI thread.
