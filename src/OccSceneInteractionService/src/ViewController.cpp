@@ -2,6 +2,7 @@
 #include "OccSceneInteractionService/ViewController.h"
 
 #include "OccSceneInteractionService/ICameraListener.h"
+#include "OccSceneInteractionService/IKeyHandler.h"
 #include "OccSceneInteractionService/IMouseClickHandler.h"
 #include "OccSceneInteractionService/IMouseHoverListener.h"
 #include "OccSceneInteractionService/IOwnerHoverListener.h"
@@ -31,6 +32,11 @@ void ViewController::setOwnerHoverListener(Handle(IOwnerHoverListener) pOwnerHov
 void ViewController::setMouseHoverListener(Handle(IMouseHoverListener) pMouseHoverListener)
 {
     m_pMouseHoverListenerSyncObject.setUiData(std::move(pMouseHoverListener));
+}
+
+void ViewController::setKeyHandler(Handle(IKeyHandler) pKeyHandler)
+{
+    m_pKeyHandlerSyncObject.setUiData(std::move(pKeyHandler));
 }
 
 void ViewController::HandleViewEvents(const Handle(AIS_InteractiveContext) & pContext, const Handle(V3d_View) & pView)
@@ -76,6 +82,33 @@ void ViewController::HandleViewEvents(const Handle(AIS_InteractiveContext) & pCo
             m_mouseHoverPositionSyncObject.resetRenderData();
         }
     }
+    
+    if(auto &&pKeyHandler = m_pKeyHandlerSyncObject.getRenderData(); pKeyHandler)
+    {
+        for(auto &&[key, action] : m_keyboardListener.getRenderKeyStates())
+        {
+            if(action == KeyboardListener::KeyAction::Pressed)
+            {
+                pKeyHandler->handleKeyPressed(key);
+            }
+            else
+            {
+                pKeyHandler->handleKeyReleased(key);
+            }
+        }
+    }
+}
+
+void ViewController::KeyDown(Aspect_VKey key, double time, double pressure)
+{
+    m_keyboardListener.onKeyPressed(key);
+    AIS_ViewController::KeyDown(key, time, pressure);
+}
+
+void ViewController::KeyUp(Aspect_VKey key, double time)
+{
+    m_keyboardListener.onKeyReleased(key);
+    AIS_ViewController::KeyUp(key, time);
 }
 
 bool ViewController::UpdateMouseClick(const Graphic3d_Vec2i &point, Aspect_VKeyMouse button, Aspect_VKeyFlags modifiers,
@@ -123,6 +156,9 @@ void ViewController::flushBuffers(const Handle(AIS_InteractiveContext) & pContex
 
     m_pMouseHoverListenerSyncObject.sync();
     m_mouseHoverPositionSyncObject.sync();
+    
+    m_keyboardListener.sync();
+    m_pKeyHandlerSyncObject.sync();
 }
 
 void ViewController::handlePanning(const Handle(V3d_View) & view)

@@ -22,6 +22,7 @@ add_executable(${TEST_EXECUTABLE_NAME})
 target_sources(${TEST_EXECUTABLE_NAME} 
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/include/TestsOccSceneInteractionService/MockCameraListener.h
+        ${CMAKE_CURRENT_LIST_DIR}/include/TestsOccSceneInteractionService/MockKeyHandler.h
         ${CMAKE_CURRENT_LIST_DIR}/include/TestsOccSceneInteractionService/MockMouseClickHandler.h
         ${CMAKE_CURRENT_LIST_DIR}/include/TestsOccSceneInteractionService/MockOwnerHoverListener.h
         ${CMAKE_CURRENT_LIST_DIR}/include/TestsOccSceneInteractionService/TestViewControllerBase.h)
@@ -35,6 +36,7 @@ target_sources(${TEST_EXECUTABLE_NAME}
         ${CMAKE_CURRENT_LIST_DIR}/src/TestUiRenderSyncObject.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/TestViewControllerAnimation.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/TestViewControllerBase.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/TestViewControllerKeyboard.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/TestViewControllerMouseHoverListener.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/TestViewControllerMouseZoom.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/TestViewControllerPan.cpp

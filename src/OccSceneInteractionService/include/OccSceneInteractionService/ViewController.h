@@ -2,6 +2,7 @@
 #ifndef OCC_SCENE_INTERACTION_SERVICE_VIEW_CONTROLLER_H
 #define OCC_SCENE_INTERACTION_SERVICE_VIEW_CONTROLLER_H
 
+#include <OccSceneInteractionService/KeyboardListener.h>
 #include <OccSceneInteractionService/OccSceneInteractionServiceExports.h>
 #include <OccSceneInteractionService/UiRenderSyncObject.h>
 
@@ -15,6 +16,7 @@ namespace osis
 {
 
 class ICameraListener;
+class IKeyHandler;
 class IMouseClickHandler;
 class IMouseHoverListener;
 class IOwnerHoverListener;
@@ -48,12 +50,28 @@ class ViewController : public AIS_ViewController
      */
     void setMouseHoverListener(Handle(IMouseHoverListener) pMouseHoverListener);
 
+    /**
+     * @brief Sets key handler. Can be NULL, if no key handler is needed. Is called from UI thread.
+     * @param pKeyHandler key handler.
+     */
+    void setKeyHandler(Handle(IKeyHandler) pKeyHandler);
+
   public: //! @name public overridden methods
     /**
      * @brief Overridden method of HandleViewEvents. Is called from Render thread.
      */
     void HandleViewEvents(const Handle(AIS_InteractiveContext) & pContext, const Handle(V3d_View) & pView) override;
     
+    /**
+     * @brief Overridden method of KeyDown. Is called from UI thread.
+     */
+    void KeyDown(Aspect_VKey key, double time, double pressure = 1.0) override;
+
+    /**
+     * @brief Overridden method of KeyUp. Is called from UI thread.
+     */
+    void KeyUp(Aspect_VKey key, double time) override;
+
     /**
      * @brief Overridden method of UpdateMouseClick. Is called from UI thread.
      */
@@ -127,6 +145,9 @@ class ViewController : public AIS_ViewController
 
     UiRenderSyncObject<Handle(IMouseHoverListener)> m_pMouseHoverListenerSyncObject;
     UiRenderSyncObject<std::optional<Graphic3d_Vec2i>> m_mouseHoverPositionSyncObject;
+    
+    KeyboardListener m_keyboardListener;
+    UiRenderSyncObject<Handle(IKeyHandler)> m_pKeyHandlerSyncObject;
 };
 
 } // namespace osis
