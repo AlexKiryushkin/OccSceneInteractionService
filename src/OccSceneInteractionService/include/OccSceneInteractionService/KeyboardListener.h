@@ -6,6 +6,7 @@
 
 #include <Aspect_VKey.hxx>
 
+#include <cstdint>
 #include <vector>
 
 namespace osis
