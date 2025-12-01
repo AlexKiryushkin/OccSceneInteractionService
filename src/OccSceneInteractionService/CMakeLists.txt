@@ -26,6 +26,7 @@ target_sources(${LIBRARY_NAME}
         FILE_SET ${PUBLIC_HEADER_SET}
         TYPE HEADERS
         FILES ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/ICameraListener.h
+              ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/IKeyHandler.h
               ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/IMouseClickHandler.h
               ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/IMouseHoverListener.h
               ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/IOwnerHoverListener.h

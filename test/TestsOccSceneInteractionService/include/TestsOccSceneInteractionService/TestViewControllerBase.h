@@ -3,6 +3,7 @@
 #define TESTS_USER_INTERACTION_SERVICE_TEST_VIEWER_CONTROLLER_BASE_H
 
 #include "TestsOccSceneInteractionService/MockCameraListener.h"
+#include "TestsOccSceneInteractionService/MockKeyHandler.h"
 #include "TestsOccSceneInteractionService/MockMouseClickHandler.h"
 #include "TestsOccSceneInteractionService/MockMouseHoverListener.h"
 #include "TestsOccSceneInteractionService/MockOwnerHoverListener.h"
@@ -20,28 +21,24 @@ namespace osis::test
 class TestViewControllerBase : public testing::Test
 {
   protected:
+    template <class T>
+    using StrictHandle = Handle(testing::StrictMock<T>);
+
     TestViewControllerBase();
 
     Handle(V3d_View) getView() const { return m_view; }
 
     Handle(AIS_InteractiveContext) getContext() const { return m_interactiveContext; }
 
-    Handle(testing::StrictMock<MockCameraListener>) getMockCameraListener() const { return m_pMockCameraListener; }
+    StrictHandle<MockCameraListener> getMockCameraListener() const { return m_pMockCameraListener; }
 
-    Handle(testing::StrictMock<MockMouseClickHandler>) getMockMouseClickHandler() const
-    {
-        return m_pMockMouseClickHandler;
-    }
+    StrictHandle<MockMouseClickHandler> getMockMouseClickHandler() const { return m_pMockMouseClickHandler; }
 
-    Handle(testing::StrictMock<MockOwnerHoverListener>) getMockOwnerHoverListener() const
-    {
-        return m_pMockOwnerHoverListener;
-    }
+    StrictHandle<MockOwnerHoverListener> getMockOwnerHoverListener() const { return m_pMockOwnerHoverListener; }
 
-    Handle(testing::StrictMock<MockMouseHoverListener>) getMockMouseHoverListener() const
-    {
-        return m_pMockMouseHoverListener;
-    }
+    StrictHandle<MockMouseHoverListener> getMockMouseHoverListener() const { return m_pMockMouseHoverListener; }
+
+    StrictHandle<MockKeyHandler> getMockKeyHandler() const { return m_pMockKeyHandler; }
 
     osis::ViewController &getViewController() { return m_aisViewController; }
 
@@ -50,14 +47,12 @@ class TestViewControllerBase : public testing::Test
 
     Handle(V3d_View) m_view;
     Handle(AIS_InteractiveContext) m_interactiveContext;
-    Handle(testing::StrictMock<MockCameraListener>)
-        m_pMockCameraListener = new testing::StrictMock<MockCameraListener>();
-    Handle(testing::StrictMock<MockMouseClickHandler>)
-        m_pMockMouseClickHandler = new testing::StrictMock<MockMouseClickHandler>();
-    Handle(testing::StrictMock<MockOwnerHoverListener>)
-        m_pMockOwnerHoverListener = new testing::StrictMock<MockOwnerHoverListener>();
-    Handle(testing::StrictMock<MockMouseHoverListener>)
-        m_pMockMouseHoverListener = new testing::StrictMock<MockMouseHoverListener>();
+
+    StrictHandle<MockCameraListener> m_pMockCameraListener = new testing::StrictMock<MockCameraListener>();
+    StrictHandle<MockMouseClickHandler> m_pMockMouseClickHandler = new testing::StrictMock<MockMouseClickHandler>();
+    StrictHandle<MockOwnerHoverListener> m_pMockOwnerHoverListener = new testing::StrictMock<MockOwnerHoverListener>();
+    StrictHandle<MockMouseHoverListener> m_pMockMouseHoverListener = new testing::StrictMock<MockMouseHoverListener>();
+    StrictHandle<MockKeyHandler> m_pMockKeyHandler = new testing::StrictMock<MockKeyHandler>();
 };
 
 } // namespace osis::test
