@@ -11,16 +11,14 @@ using ::testing::_;
 class TestViewControllerKeyboard : public TestViewControllerBase
 {
   protected:
-    TestViewControllerKeyboard()
-        : TestViewControllerBase{}
-    {
-    }
+    double m_firstTimePress = 10.0;
+    double m_secondTimePress = 10.1;
 };
 
 // Just checks that we do not crash if there is no key handler. Nothing else to check
 TEST_F(TestViewControllerKeyboard, keyDown_noKeyHandler)
 {
-    getViewController().KeyDown(Aspect_VKey_6, 10.0, 0.0);
+    getViewController().KeyDown(Aspect_VKey_6, m_firstTimePress, 0.0);
     getViewController().FlushViewEvents(getContext(), getView(), false);
     getViewController().HandleViewEvents(getContext(), getView());
 }
@@ -28,7 +26,7 @@ TEST_F(TestViewControllerKeyboard, keyDown_noKeyHandler)
 // Just checks that we do not crash if there is no key handler. Nothing else to check
 TEST_F(TestViewControllerKeyboard, keyUp_noKeyHandler)
 {
-    getViewController().KeyUp(Aspect_VKey_6, 10.0);
+    getViewController().KeyUp(Aspect_VKey_6, m_firstTimePress);
     getViewController().FlushViewEvents(getContext(), getView(), false);
     getViewController().HandleViewEvents(getContext(), getView());
 }
@@ -39,7 +37,7 @@ TEST_F(TestViewControllerKeyboard, keyDownSimple_callbackIsCalled)
 
     for(const auto key : {Aspect_VKey_6, Aspect_VKey_Backspace, Aspect_VKey_Escape})
     {
-        getViewController().KeyDown(key, 10.0, 0.0);
+        getViewController().KeyDown(key, m_firstTimePress, 0.0);
         getViewController().FlushViewEvents(getContext(), getView(), false);
 
         EXPECT_CALL(*getMockKeyHandler(), handleKeyPressed(key));
@@ -53,7 +51,7 @@ TEST_F(TestViewControllerKeyboard, keyUpSimple_callbackIsCalled)
 
     for(const auto key : {Aspect_VKey_6, Aspect_VKey_Backspace, Aspect_VKey_Escape})
     {
-        getViewController().KeyUp(key, 10.0);
+        getViewController().KeyUp(key, m_firstTimePress);
         getViewController().FlushViewEvents(getContext(), getView(), false);
 
         EXPECT_CALL(*getMockKeyHandler(), handleKeyReleased(key));
@@ -73,7 +71,7 @@ TEST_F(TestViewControllerKeyboard, keyDownSeveral_callbacksAreCalled)
     {
         for(const auto key : keys)
         {
-            getViewController().KeyDown(key, 10.0, 0.0);
+            getViewController().KeyDown(key, m_firstTimePress, 0.0);
         }
         getViewController().FlushViewEvents(getContext(), getView(), false);
 
@@ -97,7 +95,7 @@ TEST_F(TestViewControllerKeyboard, keyUpSeveral_callbacksAreCalled)
     {
         for(const auto key : keys)
         {
-            getViewController().KeyUp(key, 10.0);
+            getViewController().KeyUp(key, m_firstTimePress);
         }
         getViewController().FlushViewEvents(getContext(), getView(), false);
 
@@ -115,11 +113,11 @@ TEST_F(TestViewControllerKeyboard, keyDownAndUpSameFrame_callbackIsCalled)
 
     for(const auto key : {Aspect_VKey_6, Aspect_VKey_Backspace, Aspect_VKey_Escape})
     {
-        getViewController().KeyDown(key, 10.0, 0.0);
-        getViewController().KeyUp(key, 10.1);
+        getViewController().KeyDown(key, m_firstTimePress, 0.0);
+        getViewController().KeyUp(key, m_secondTimePress);
         getViewController().FlushViewEvents(getContext(), getView(), false);
 
-        ::testing::InSequence s;
+        ::testing::InSequence inSequence;
         EXPECT_CALL(*getMockKeyHandler(), handleKeyPressed(key));
         EXPECT_CALL(*getMockKeyHandler(), handleKeyReleased(key));
 
@@ -133,7 +131,7 @@ TEST_F(TestViewControllerKeyboard, keyDownSimple_noCallbackSecondFrame)
 
     for(const auto key : {Aspect_VKey_6, Aspect_VKey_Backspace, Aspect_VKey_Escape})
     {
-        getViewController().KeyDown(key, 10.0, 0.0);
+        getViewController().KeyDown(key, m_firstTimePress, 0.0);
         getViewController().FlushViewEvents(getContext(), getView(), false);
 
         EXPECT_CALL(*getMockKeyHandler(), handleKeyPressed(key));
@@ -152,7 +150,7 @@ TEST_F(TestViewControllerKeyboard, keyUpSimple_noCallbackSecondFrame)
 
     for(const auto key : {Aspect_VKey_6, Aspect_VKey_Backspace, Aspect_VKey_Escape})
     {
-        getViewController().KeyUp(key, 10.0);
+        getViewController().KeyUp(key, m_firstTimePress);
         getViewController().FlushViewEvents(getContext(), getView(), false);
 
         EXPECT_CALL(*getMockKeyHandler(), handleKeyReleased(key));
