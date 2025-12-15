@@ -17,7 +17,7 @@ namespace osis
 class UserActionInput
 {
   public:
-    enum class ApplyOn
+    enum class ApplyOn : std::uint8_t
     {
         Continue = 0x02,
         Stop = 0x04
@@ -29,13 +29,13 @@ class UserActionInput
      * @brief Returns user input data gathered in UI thread. Should be called in UI thread.
      * @return User input data gathered in UI thread.
      */
-    const UserActionInputData &getUiUserInputData() const { return m_uiInputData; }
+    [[nodiscard]] const UserActionInputData &getUiUserInputData() const { return m_uiInputData; }
 
     /**
      * @brief Returns user input data in Render thread that was synced from UI thread. Should be called in Render thread
      * @return User input data in Render thread that was synced from UI thread.
      */
-    const UserActionInputData &getRenderUserInputData() const { return m_renderInputData; }
+    [[nodiscard]] const UserActionInputData &getRenderUserInputData() const { return m_renderInputData; }
 
     /**
      * @brief This method is called once we start gathering user input. Should be called in UI thread.
@@ -80,7 +80,7 @@ class UserActionInput
     void addPoint(const Graphic3d_Vec2i &point);
 
   private:
-    enum class ActionState
+    enum class ActionState : std::uint8_t
     {
         NotEntered,
         Started,
