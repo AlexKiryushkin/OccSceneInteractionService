@@ -5,6 +5,7 @@
 #include <OccSceneInteractionService/OccSceneInteractionServiceExports.h>
 #include <OccSceneInteractionService/UserActionInputData.h>
 
+#include <cstdint>
 #include <optional>
 
 namespace osis
