@@ -32,13 +32,16 @@ target_sources(${LIBRARY_NAME}
               ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/IOwnerHoverListener.h
               ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/KeyboardListener.h
               ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/UiRenderSyncObject.h
+              ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/UserActionInput.h
+              ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/UserActionInputData.h
               ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/ViewController.h
 )
 
 target_sources(${LIBRARY_NAME} 
     PRIVATE
-        ${CMAKE_CURRENT_LIST_DIR}/src/ViewController.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/src/KeyboardListener.cpp)
+        ${CMAKE_CURRENT_LIST_DIR}/src/KeyboardListener.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/UserActionInput.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/ViewController.cpp)
 
 
 # -------------------------------------------------------------------------------------------------

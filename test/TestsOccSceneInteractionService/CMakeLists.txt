@@ -34,6 +34,7 @@ target_sources(${TEST_EXECUTABLE_NAME}
         ${CMAKE_CURRENT_LIST_DIR}/src/TestOwnerHoverListener.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/TestRtti.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/TestUiRenderSyncObject.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/TestUserActionInput.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/TestViewControllerAnimation.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/TestViewControllerBase.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/TestViewControllerKeyboard.cpp
