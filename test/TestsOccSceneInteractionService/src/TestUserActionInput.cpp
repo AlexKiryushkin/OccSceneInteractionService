@@ -77,6 +77,21 @@ TEST_F(TestUserActionInput, startGatherInput_calledTwiceThrows)
     EXPECT_THROW(userActionInput.startGatherInput(Graphic3d_Vec2i{}), std::exception);
 }
 
+/**
+ * @brief Checks resetUiInput resets all the data
+ */
+TEST_F(TestUserActionInput, resetUiInput)
+{
+    auto userActionInput = UserActionInput(UserActionInput::ApplyOn::Stop, 2);
+
+    userActionInput.startGatherInput(Graphic3d_Vec2i{});
+    userActionInput.resetUiInput();
+
+    EXPECT_FALSE(userActionInput.getUiUserInputData().toStart);
+    EXPECT_FALSE(userActionInput.getUiUserInputData().toApply);
+    ASSERT_EQ(userActionInput.getUiUserInputData().inputPoints.size(), 0ULL);
+}
+
 ///
 /// TESTS for gathering UI input
 ///
@@ -299,9 +314,12 @@ TEST_F(TestUserActionInput, sync_beforeStartDoesNothing)
 
     // Dirty hack but should not cause UB as the object itself is not constant. We modify UI data to check that it won't
     // be copied to render data.
-    const_cast<UserActionInputData &>(userActionInput.getUiUserInputData()).inputPoints.push_back({});
+
+    // NOLINTBEGIN(cppcoreguidelines-pro-type-const-cast)
+    const_cast<UserActionInputData &>(userActionInput.getUiUserInputData()).inputPoints.emplace_back();
     const_cast<UserActionInputData &>(userActionInput.getUiUserInputData()).toStart = true;
     const_cast<UserActionInputData &>(userActionInput.getUiUserInputData()).toApply = true;
+    // NOLINTEND(cppcoreguidelines-pro-type-const-cast)
 
     userActionInput.sync();
 
