@@ -18,6 +18,8 @@ UserActionInput::UserActionInput(UserActionInput::ApplyOn applyOn, std::optional
 
 void UserActionInput::resetUiInput()
 {
+    m_actionState = ActionState::NotEntered;
+
     m_uiInputData.toStart = false;
     m_uiInputData.toApply = false;
     m_uiInputData.inputPoints.clear();

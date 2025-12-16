@@ -9,10 +9,20 @@
 
 #include <AIS_AnimationCamera.hxx>
 #include <AIS_InteractiveContext.hxx>
+#include <AIS_MouseGesture.hxx>
 #include <V3d_View.hxx>
+
+#include <cassert>
+
+static constexpr auto cCustomValueStart = 100;
 
 namespace osis
 {
+
+void ViewController::setCustomMouseActions(std::vector<Handle(CustomMouseAction)> customMouseActions)
+{
+    m_customMouseActionsSyncObject.setUiData(std::move(customMouseActions));
+}
 
 void ViewController::setCameraListener(Handle(ICameraListener) pCameraListener)
 {
@@ -97,6 +107,16 @@ void ViewController::HandleViewEvents(const Handle(AIS_InteractiveContext) & pCo
             }
         }
     }
+
+    for(auto &&action : m_customMouseActionsSyncObject.getRenderData())
+    {
+        action->handle();
+    }
+
+    for(auto &&action : m_customMouseActionsSyncObject.getRenderData())
+    {
+        action->clearRenderInput();
+    }
 }
 
 void ViewController::KeyDown(Aspect_VKey key, double time, double pressure)
@@ -109,6 +129,30 @@ void ViewController::KeyUp(Aspect_VKey key, double time)
 {
     m_keyboardListener.onKeyReleased(key);
     AIS_ViewController::KeyUp(key, time);
+}
+
+bool ViewController::UpdateMouseButtons(const Graphic3d_Vec2i &point, Aspect_VKeyMouse buttons,
+                                        Aspect_VKeyFlags modifiers, bool isEmulated)
+{
+    const auto prevGesture = myMouseActiveGesture;
+    auto toUpdateView = AIS_ViewController::UpdateMouseButtons(point, buttons, modifiers, isEmulated);
+
+    if(prevGesture != myMouseActiveGesture)
+    {
+        if(const auto foundIter = m_customActionValues.find(prevGesture); foundIter != std::end(m_customActionValues))
+        {
+            foundIter->second->stopAction(point);
+            toUpdateView = true;
+        }
+        if(const auto foundIter = m_customActionValues.find(myMouseActiveGesture);
+           foundIter != std::end(m_customActionValues))
+        {
+            foundIter->second->startAction(point);
+            toUpdateView = true;
+        }
+    }
+
+    return toUpdateView;
 }
 
 bool ViewController::UpdateMouseClick(const Graphic3d_Vec2i &point, Aspect_VKeyMouse button, Aspect_VKeyFlags modifiers,
@@ -129,8 +173,14 @@ bool ViewController::UpdateMouseClick(const Graphic3d_Vec2i &point, Aspect_VKeyM
 bool ViewController::UpdateMousePosition(const Graphic3d_Vec2i &point, Aspect_VKeyMouse buttons,
                                          Aspect_VKeyFlags modifiers, bool isEmulated)
 {
-
     auto toUpdateView = AIS_ViewController::UpdateMousePosition(point, buttons, modifiers, isEmulated);
+
+    if(const auto foundIter = m_customActionValues.find(myMouseActiveGesture);
+       foundIter != std::end(m_customActionValues))
+    {
+        foundIter->second->continueAction(point);
+        toUpdateView = true;
+    }
 
     if(buttons == Aspect_VKeyMouse_NONE)
     {
@@ -159,6 +209,8 @@ void ViewController::flushBuffers(const Handle(AIS_InteractiveContext) & pContex
     
     m_keyboardListener.sync();
     m_pKeyHandlerSyncObject.sync();
+
+    flushActions();
 }
 
 void ViewController::handlePanning(const Handle(V3d_View) & view)
@@ -228,6 +280,48 @@ void ViewController::contextLazyMoveTo(const Handle(AIS_InteractiveContext) & co
     if(!pCurrLastPicked.IsNull())
     {
         pOwnerHoverListener->handleOwnerStartHovered(pCurrLastPicked);
+    }
+}
+
+void ViewController::flushActions()
+{
+    if(const auto oldCustomActions = m_customMouseActionsSyncObject.getRenderData();
+       m_customMouseActionsSyncObject.sync())
+    {
+        for(auto &&pAction : oldCustomActions)
+        {
+            pAction->tearDown();
+
+            for(auto combination : pAction->getMouseCombinations())
+            {
+                const auto wasUnbound = myMouseGestureMap.UnBind(combination);
+                assert(wasUnbound);
+            }
+        }
+        m_customActionValues.clear();
+
+        auto customActionValue = cCustomValueStart;
+        for(auto &&customAction : m_customMouseActionsSyncObject.getRenderData())
+        {
+            customAction->setUp();
+
+            for(auto combination : customAction->getMouseCombinations())
+            {
+                const auto wasInserted =
+                    myMouseGestureMap.Bind(combination, static_cast<AIS_MouseGesture>(customActionValue));
+                assert(wasInserted);
+            }
+
+            m_customActionValues.emplace(customActionValue, customAction);
+            ++customActionValue;
+        }
+    }
+    else
+    {
+        for(auto &&action : m_customMouseActionsSyncObject.getRenderData())
+        {
+            action->sync();
+        }
     }
 }
 

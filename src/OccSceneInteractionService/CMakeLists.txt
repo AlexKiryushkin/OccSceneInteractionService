@@ -25,7 +25,9 @@ target_sources(${LIBRARY_NAME}
     PRIVATE
         FILE_SET ${PUBLIC_HEADER_SET}
         TYPE HEADERS
-        FILES ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/ICameraListener.h
+        FILES ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/CustomMouseAction.h
+              ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/ICameraListener.h
+              ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/IInputHandler.h
               ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/IKeyHandler.h
               ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/IMouseClickHandler.h
               ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/IMouseHoverListener.h
