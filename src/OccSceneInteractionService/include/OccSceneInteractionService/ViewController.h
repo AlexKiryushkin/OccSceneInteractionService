@@ -2,6 +2,7 @@
 #ifndef OCC_SCENE_INTERACTION_SERVICE_VIEW_CONTROLLER_H
 #define OCC_SCENE_INTERACTION_SERVICE_VIEW_CONTROLLER_H
 
+#include <OccSceneInteractionService/CustomMouseAction.h>
 #include <OccSceneInteractionService/KeyboardListener.h>
 #include <OccSceneInteractionService/OccSceneInteractionServiceExports.h>
 #include <OccSceneInteractionService/UiRenderSyncObject.h>
@@ -10,6 +11,7 @@
 #include <Graphic3d_Vec2.hxx>
 #include <Standard_Handle.hxx>
 
+#include <map>
 #include <optional>
 
 namespace osis
@@ -25,6 +27,12 @@ class ViewController : public AIS_ViewController
 {
   public: //! @name public methods
     OSIS_API ViewController() = default;
+
+    /**
+     * @brief Sets custom actions for the graphics scene. Is called from UI thread.
+     * @param customMouseActions Custom actions.
+     */
+    void setCustomMouseActions(std::vector<Handle(CustomMouseAction)> customMouseActions);
 
     /**
      * @brief Sets camera listener. Can be NULL, if no camera listener is needed. Is called from UI thread.
@@ -73,6 +81,12 @@ class ViewController : public AIS_ViewController
     void KeyUp(Aspect_VKey key, double time) override;
 
     /**
+     * @brief Overridden method of UpdateMouseButtons. Is called from UI thread.
+     */
+    bool UpdateMouseButtons(const Graphic3d_Vec2i &point, Aspect_VKeyMouse buttons, Aspect_VKeyFlags modifiers,
+                            bool isEmulated) override;
+
+    /**
      * @brief Overridden method of UpdateMouseClick. Is called from UI thread.
      */
     bool UpdateMouseClick(const Graphic3d_Vec2i &point, Aspect_VKeyMouse button, Aspect_VKeyFlags modifiers,
@@ -117,6 +131,12 @@ class ViewController : public AIS_ViewController
     void contextLazyMoveTo(const Handle(AIS_InteractiveContext) &context, const Handle(V3d_View) &view,
                            const Graphic3d_Vec2i &thePnt) override;
 
+  private: //! @name private methods
+    /**
+     * @brief Flushes actions input and/or setting new actions. Is called at sync stage between UI and Render threads.
+     */
+    void flushActions();
+
   private:
     struct MouseClickData
     {
@@ -148,6 +168,9 @@ class ViewController : public AIS_ViewController
     
     KeyboardListener m_keyboardListener;
     UiRenderSyncObject<Handle(IKeyHandler)> m_pKeyHandlerSyncObject;
+
+    UiRenderSyncObject<std::vector<Handle(CustomMouseAction)>> m_customMouseActionsSyncObject;
+    std::map<unsigned int, Handle(CustomMouseAction)> m_customActionValues;
 };
 
 } // namespace osis

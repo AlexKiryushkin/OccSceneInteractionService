@@ -1,5 +1,7 @@
 
 #include "TestsOccSceneInteractionService/MockCameraListener.h"
+#include "TestsOccSceneInteractionService/MockCustomMouseAction.h"
+#include "TestsOccSceneInteractionService/MockInputHandler.h"
 #include "TestsOccSceneInteractionService/MockKeyHandler.h"
 #include "TestsOccSceneInteractionService/MockMouseClickHandler.h"
 #include "TestsOccSceneInteractionService/MockMouseHoverListener.h"
@@ -50,10 +52,28 @@ TEST_F(TestRtti, IMouseHoverListener)
 
 TEST_F(TestRtti, IKeyHandler)
 {
-    MockKeyHandler mocKeyHandler;
+    MockKeyHandler mockKeyHandler;
 
     // We do not add RTTI for MockKeyHandler, so this should be equal
-    EXPECT_EQ(IKeyHandler::get_type_descriptor(), mocKeyHandler.DynamicType());
+    EXPECT_EQ(IKeyHandler::get_type_descriptor(), mockKeyHandler.DynamicType());
+}
+
+TEST_F(TestRtti, IInputHandler)
+{
+    MockInputHandler mockInputHandler;
+
+    // We do not add RTTI for MockInputHandler, so this should be equal
+    EXPECT_EQ(IInputHandler::get_type_descriptor(), mockInputHandler.DynamicType());
+}
+
+TEST_F(TestRtti, CustomMouseAction)
+{
+    UserActionInput userActionInput{UserActionInput::ApplyOn::Continue, 2};
+    MockCustomMouseAction mockCustomMouseAction{
+        userActionInput, std::vector<unsigned>{Aspect_VKeyMouse_LeftButton}, {}};
+
+    // We do not add RTTI for CustomMouseAction, so this should be equal
+    EXPECT_EQ(CustomMouseAction::get_type_descriptor(), mockCustomMouseAction.DynamicType());
 }
 
 } // namespace osis::test
