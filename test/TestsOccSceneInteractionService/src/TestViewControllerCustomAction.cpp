@@ -18,7 +18,7 @@ static constexpr auto cCtrlKey = Aspect_VKeyFlags_CTRL;
 static constexpr auto cShiftKey = Aspect_VKeyFlags_SHIFT;
 static constexpr auto cAltKey = Aspect_VKeyFlags_ALT;
 
-// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers)
 class TestViewControllerCustomAction : public TestViewControllerBase
 {
   protected:
@@ -371,6 +371,6 @@ TEST_F(TestViewControllerCustomAction, setNewAction_tearDownIsCalled)
     getViewController().setCustomMouseActions({pCustomAction});
     getViewController().FlushViewEvents(getContext(), getView(), false);
 }
-// NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers)
 
 } // namespace osis::test
