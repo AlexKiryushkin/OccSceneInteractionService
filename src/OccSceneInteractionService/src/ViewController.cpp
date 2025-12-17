@@ -296,6 +296,7 @@ void ViewController::flushActions()
             {
                 const auto wasUnbound = myMouseGestureMap.UnBind(combination);
                 assert(wasUnbound);
+                static_cast<void>(wasUnbound);
             }
         }
         m_customActionValues.clear();
@@ -310,6 +311,7 @@ void ViewController::flushActions()
                 const auto wasInserted =
                     myMouseGestureMap.Bind(combination, static_cast<AIS_MouseGesture>(customActionValue));
                 assert(wasInserted);
+                static_cast<void>(wasInserted);
             }
 
             m_customActionValues.emplace(customActionValue, customAction);
