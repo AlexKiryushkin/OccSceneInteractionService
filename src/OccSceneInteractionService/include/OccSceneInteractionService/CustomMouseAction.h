@@ -46,10 +46,10 @@ class OSIS_API CustomMouseAction : public Standard_Transient
     }
 
     CustomMouseAction(const CustomMouseAction &) = default;
-    CustomMouseAction(CustomMouseAction &&) = default;
+    CustomMouseAction(CustomMouseAction &&) noexcept = default;
 
     CustomMouseAction &operator=(const CustomMouseAction &) = default;
-    CustomMouseAction &operator=(CustomMouseAction &&) = default;
+    CustomMouseAction &operator=(CustomMouseAction &&) noexcept = default;
 
     ~CustomMouseAction() override = default;
 
