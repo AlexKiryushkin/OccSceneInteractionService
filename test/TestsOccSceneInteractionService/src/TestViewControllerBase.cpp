@@ -1,24 +1,6 @@
 
 #include "TestsOccSceneInteractionService/TestViewControllerBase.h"
 
-#include <Aspect_DisplayConnection.hxx>
-#include <Aspect_NeutralWindow.hxx>
-#include <OpenGl_GraphicDriver.hxx>
-
-#include <Aspect_DisplayConnection.hxx>
-#include <Aspect_RenderingContext.hxx>
-#include <Aspect_Window.hxx>
-#include <Graphic3d_Vec.hxx>
-#include <TCollection_AsciiString.hxx>
-
-#if defined(__APPLE__)
-#include <Cocoa_Window.hxx>
-#elif defined(_WIN32)
-#include <WNT_Window.hxx>
-#else
-#include <Xw_Window.hxx>
-#endif
-
 #if defined(__APPLE__)
 #undef Handle // avoid name collisions in macOS headers
 #define GLFW_EXPOSE_NATIVE_COCOA
@@ -33,20 +15,28 @@
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 
+#include <Aspect_DisplayConnection.hxx>
+#include <Aspect_NeutralWindow.hxx>
+#include <Aspect_RenderingContext.hxx>
+#include <Aspect_Window.hxx>
+#include <Graphic3d_Vec.hxx>
+#include <OpenGl_GraphicDriver.hxx>
+#include <Standard_Type.hxx>
+#include <TCollection_AsciiString.hxx>
+
+
 namespace osis::test
 {
 
 namespace
 {
 
-//! GLFWwindow wrapper implementing Aspect_Window interface.
 class GlfwOcctWindow : public Aspect_Window
 {
   public:
     DEFINE_STANDARD_RTTI_INLINE(GlfwOcctWindow, Aspect_Window)
 
   public:
-    //! Main constructor.
     GlfwOcctWindow(int width, int height, const TCollection_AsciiString &title)
         : m_glfwWindow(glfwCreateWindow(width, height, title.ToCString(), nullptr, nullptr))
         , m_xLeft(0)
@@ -62,17 +52,11 @@ class GlfwOcctWindow : public Aspect_Window
 
             m_xRight = m_xLeft + aWidth;
             m_yBottom = m_yTop + aHeight;
-
-#if !defined(_WIN32) && !defined(__APPLE__)
-            m_display = new Aspect_DisplayConnection((Aspect_XDisplay *)glfwGetX11Display());
-#endif
         }
     }
 
-    //! Close the window.
     ~GlfwOcctWindow() override { Close(); }
 
-    //! Close the window.
     void Close()
     {
         if(m_glfwWindow != nullptr)
@@ -82,18 +66,14 @@ class GlfwOcctWindow : public Aspect_Window
         }
     }
 
-    //! Return X Display connection.
-    const Handle(Aspect_DisplayConnection) & GetDisplay() const { return m_display; }
-
-    //! Return native OpenGL context.
     Aspect_RenderingContext NativeGlContext() const
     {
 #if defined(__APPLE__)
-        return (NSOpenGLContext *)glfwGetNSGLContext(myGlfwWindow);
+        return (NSOpenGLContext *)glfwGetNSGLContext(m_glfwWindow);
 #elif defined(_WIN32)
         return glfwGetWGLContext(m_glfwWindow);
 #else
-        return glfwGetGLXContext(myGlfwWindow);
+        return glfwGetGLXContext(m_glfwWindow);
 #endif
     }
 
@@ -101,11 +81,11 @@ class GlfwOcctWindow : public Aspect_Window
     Aspect_Drawable NativeHandle() const override
     {
 #if defined(__APPLE__)
-        return (Aspect_Drawable)glfwGetCocoaWindow(myGlfwWindow);
+        return (Aspect_Drawable)glfwGetCocoaWindow(m_glfwWindow);
 #elif defined(_WIN32)
         return (Aspect_Drawable)glfwGetWin32Window(m_glfwWindow);
 #else
-        return (Aspect_Drawable)glfwGetX11Window(myGlfwWindow);
+        return (Aspect_Drawable)glfwGetX11Window(m_glfwWindow);
 #endif
     }
 
@@ -163,7 +143,6 @@ class GlfwOcctWindow : public Aspect_Window
     Aspect_FBConfig NativeFBConfig() const override { return nullptr; }
 
   protected:
-    Handle(Aspect_DisplayConnection) m_display;
     GLFWwindow *m_glfwWindow;
     Standard_Integer m_xLeft;
     Standard_Integer m_yTop;
@@ -181,10 +160,10 @@ TestViewControllerBase::TestViewControllerBase()
     Handle(Aspect_DisplayConnection) pDisplayConnection =
         new Aspect_DisplayConnection((Aspect_XDisplay *)glfwGetX11Display());
 #else
-    Handle(Aspect_DisplayConnection) pDisplayConnection = new Aspect_DisplayConnection();
+    Handle(Aspect_DisplayConnection) pDisplayConnection;
 #endif
 
-    Handle(OpenGl_GraphicDriver) pGraphicDriver = new OpenGl_GraphicDriver(pDisplayConnection, false);
+    Handle(OpenGl_GraphicDriver) pGraphicDriver = new OpenGl_GraphicDriver(pDisplayConnection);
 
     Handle(V3d_Viewer) pViewer = new V3d_Viewer(pGraphicDriver);
 
