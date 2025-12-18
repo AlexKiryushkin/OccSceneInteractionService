@@ -21,6 +21,7 @@ add_executable(${TEST_EXECUTABLE_NAME})
 # -------------------------------------------------------------------------------------------------
 target_sources(${TEST_EXECUTABLE_NAME} 
     PRIVATE
+        ${CMAKE_CURRENT_LIST_DIR}/include/TestsOccSceneInteractionService/GlfwOcctWindow.h
         ${CMAKE_CURRENT_LIST_DIR}/include/TestsOccSceneInteractionService/MockCameraListener.h
         ${CMAKE_CURRENT_LIST_DIR}/include/TestsOccSceneInteractionService/MockCustomMouseAction.h
         ${CMAKE_CURRENT_LIST_DIR}/include/TestsOccSceneInteractionService/MockInputHandler.h
@@ -31,6 +32,7 @@ target_sources(${TEST_EXECUTABLE_NAME}
 
 target_sources(${TEST_EXECUTABLE_NAME} 
     PRIVATE
+        ${CMAKE_CURRENT_LIST_DIR}/src/GlfwOcctWindow.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/main.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/TestKeyBoardListener.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/TestOwnerHoverListener.cpp
