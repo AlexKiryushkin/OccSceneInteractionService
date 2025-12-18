@@ -51,7 +51,6 @@ jobs:
           cmake --build . --config ${{ matrix.config.build_type }}
 
       - name: Test
-        if: runner.os == 'Windows'
         working-directory: build
         run: |
           ctest -V

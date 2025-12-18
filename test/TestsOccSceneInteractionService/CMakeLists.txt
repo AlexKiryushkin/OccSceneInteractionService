@@ -53,6 +53,8 @@ target_sources(${TEST_EXECUTABLE_NAME}
 # -------------------------------------------------------------------------------------------------
 find_package(GTest CONFIG REQUIRED)
 find_package(OpenCASCADE REQUIRED)
+find_package(OpenGL REQUIRED)
+find_package(glfw3 REQUIRED)
 include(GoogleTest)
 
 
@@ -67,6 +69,7 @@ target_link_libraries(
             GTest::gmock_main
             TKOpenGl
             ${OpenCASCADE_LIBRARIES}
+            glfw
 )
 
 
