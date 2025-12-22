@@ -16,7 +16,7 @@
 namespace osis
 {
 
-/**
+/**  @ingroup UserInteractionService
  * @brief This is an abstract class for different actions. By action we mean some graphics scene action that starts
  * for some particular mouse combination (mouse + modifier) and ends when this combination changes to the one action
  * does not accept. This class provides interface for both handling it in UI and Render threads, and at sync between

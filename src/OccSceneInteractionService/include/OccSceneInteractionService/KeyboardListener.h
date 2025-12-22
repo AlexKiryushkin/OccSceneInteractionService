@@ -12,7 +12,7 @@
 namespace osis
 {
 
-/**
+/** @ingroup UserInteractionService
  * @brief This class is needed to listen to keyboard events on UI side and pass them to Render side. Default OCC
  * implementation only has a callback on UI side.
  */

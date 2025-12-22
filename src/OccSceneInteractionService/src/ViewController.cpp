@@ -6,18 +6,45 @@
 #include "OccSceneInteractionService/IMouseClickHandler.h"
 #include "OccSceneInteractionService/IMouseHoverListener.h"
 #include "OccSceneInteractionService/IOwnerHoverListener.h"
+#include "OccSceneInteractionService/SceneInteractionEnvironment.h"
 
 #include <AIS_AnimationCamera.hxx>
 #include <AIS_InteractiveContext.hxx>
 #include <AIS_MouseGesture.hxx>
 #include <V3d_View.hxx>
 
+#include <algorithm>
 #include <cassert>
 
 static constexpr auto cCustomValueStart = 100;
 
 namespace osis
 {
+
+void ViewController::setSceneInteractionEnvironment(const SceneInteractionEnvironment &sceneInteractionEnvironment)
+{
+    setCameraEnvironment(sceneInteractionEnvironment.cameraEnvironment);
+    setSelectionEnvironment(sceneInteractionEnvironment.selectionEnvironment);
+    setCustomMouseActions(sceneInteractionEnvironment.customMouseActions);
+    setKeyHandler(sceneInteractionEnvironment.pKeyHandler);
+    setMouseClickHandler(sceneInteractionEnvironment.pMouseClickHandler);
+    setMouseHoverListener(sceneInteractionEnvironment.pMouseHoverListener);
+}
+
+void ViewController::setCameraEnvironment(const CameraEnvironment &cameraEnvironment)
+{
+    SetAllowPanning(cameraEnvironment.allowPan);
+    SetAllowRotation(cameraEnvironment.allowRotation);
+    SetAllowZooming(cameraEnvironment.allowZoom);
+    setCameraListener(cameraEnvironment.pCameraListener);
+}
+
+void ViewController::setSelectionEnvironment(const SelectionEnvironment &selectionEnvironment)
+{
+    setAllowRubberBandSelection(selectionEnvironment.allowRubberBandSelection);
+    setSelectionFilter(selectionEnvironment.pSelectionFilter);
+    setOwnerHoverListener(selectionEnvironment.pOwnerHoverListener);
+}
 
 void ViewController::setCustomMouseActions(std::vector<Handle(CustomMouseAction)> customMouseActions)
 {
@@ -47,6 +74,11 @@ void ViewController::setMouseHoverListener(Handle(IMouseHoverListener) pMouseHov
 void ViewController::setKeyHandler(Handle(IKeyHandler) pKeyHandler)
 {
     m_pKeyHandlerSyncObject.setUiData(std::move(pKeyHandler));
+}
+
+void ViewController::setSelectionFilter(Handle(SelectMgr_Filter) pSelectionFilter)
+{
+    m_pSelectionFilterSyncObject.setUiData(std::move(pSelectionFilter));
 }
 
 void ViewController::HandleViewEvents(const Handle(AIS_InteractiveContext) & pContext, const Handle(V3d_View) & pView)
@@ -194,6 +226,31 @@ bool ViewController::UpdateMousePosition(const Graphic3d_Vec2i &point, Aspect_VK
     return toUpdateView;
 }
 
+Handle(IOwnerHoverListener) ViewController::getOwnerHoverListener() const
+{
+    return m_pOwnerHoverListenerSyncObject.getRenderData();
+}
+
+const std::vector<Handle(CustomMouseAction)> &ViewController::getCustomActions() const
+{
+    return m_customMouseActionsSyncObject.getRenderData();
+}
+
+Handle(IKeyHandler) ViewController::getKeyHandler() const
+{
+    return m_pKeyHandlerSyncObject.getRenderData();
+}
+
+Handle(IMouseClickHandler) ViewController::getMouseClickHandler() const
+{
+    return m_pMouseClickHandlerSyncObject.getRenderData();
+}
+
+Handle(IMouseHoverListener) ViewController::getMouseHoverListener() const
+{
+    return m_pMouseHoverListenerSyncObject.getRenderData();
+}
+
 void ViewController::flushBuffers(const Handle(AIS_InteractiveContext) & pContext, const Handle(V3d_View) & pView)
 {
     AIS_ViewController::flushBuffers(pContext, pView);
@@ -209,6 +266,20 @@ void ViewController::flushBuffers(const Handle(AIS_InteractiveContext) & pContex
     
     m_keyboardListener.sync();
     m_pKeyHandlerSyncObject.sync();
+
+    if(const auto pOldSelectionFilter = m_pSelectionFilterSyncObject.getRenderData();
+       m_pSelectionFilterSyncObject.sync())
+    {
+        if(pOldSelectionFilter)
+        {
+            pContext->RemoveFilter(pOldSelectionFilter);
+        }
+
+        if(const auto pSelectionFilter = m_pSelectionFilterSyncObject.getRenderData(); pSelectionFilter)
+        {
+            pContext->AddFilter(pSelectionFilter);
+        }
+    }
 
     flushActions();
 }
@@ -325,6 +396,41 @@ void ViewController::flushActions()
             action->sync();
         }
     }
+}
+
+void ViewController::setAllowRubberBandSelection(bool toAllow) {
+
+    if(toAllow)
+    {
+        for (auto key : m_rubberBandModifiers)
+        {
+            myMouseGestureMap.Bind(key, AIS_MouseGesture_SelectRectangle);
+        }
+
+        m_rubberBandModifiers.clear();
+    }
+    else
+    {
+        auto mouseGestureIter = std::remove_reference_t<decltype(myMouseGestureMap)>::Iterator{myMouseGestureMap};
+        for(; mouseGestureIter.More(); mouseGestureIter.Next())
+        {
+            if(mouseGestureIter.Value() == AIS_MouseGesture_SelectRectangle)
+            {
+                m_rubberBandModifiers.emplace(mouseGestureIter.Key());
+            }
+        }
+
+        for(auto key : m_rubberBandModifiers)
+        {
+            myMouseGestureMap.UnBind(key);
+        }
+    }
+}
+
+bool ViewController::toAllowRubberBandSelection() const
+{
+    return std::any_of(std::begin(myMouseGestureMap), std::end(myMouseGestureMap),
+                       [](AIS_MouseGesture mouseGesture) { return mouseGesture == AIS_MouseGesture_SelectRectangle; });
 }
 
 } // namespace osis

@@ -9,7 +9,7 @@
 namespace osis
 {
 
-/**
+/** @ingroup UserInteractionService
  * @brief An interface that allow to perform additional actions on mouse movement without any buttons pressed.
  */
 class IMouseHoverListener : public Standard_Transient

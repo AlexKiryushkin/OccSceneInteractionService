@@ -10,7 +10,7 @@
 namespace osis
 {
 
-/**
+/** @ingroup UserInteractionService
  * @brief An interface that allow to perform additional actions on mouse clicks in render thread. By mouse clicks we
  * mean pressing and releasing a mouse button in the same place on the screen within some tolerance.
  */

@@ -9,7 +9,7 @@
 namespace osis
 {
 
-/**
+/** @ingroup UserInteractionService
  * @brief An interface for additional actions on camera events.
  * @details This class provides a series of callbacks on camera events such as: panning, rotating, zooming, starting
  * and stopping of animation, etc. This might be useful if we want to recalculate some values on camera changes or block

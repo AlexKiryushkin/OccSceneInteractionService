@@ -9,7 +9,7 @@
 namespace osis
 {
 
-/**
+/** @ingroup UserInteractionService
  * @brief All necessary data from user input to perform an action.
  */
 struct UserActionInputData

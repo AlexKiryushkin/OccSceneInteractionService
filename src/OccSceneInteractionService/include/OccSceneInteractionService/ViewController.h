@@ -13,6 +13,9 @@
 
 #include <map>
 #include <optional>
+#include <unordered_set>
+
+class SelectMgr_Filter;
 
 namespace osis
 {
@@ -23,10 +26,95 @@ class IMouseClickHandler;
 class IMouseHoverListener;
 class IOwnerHoverListener;
 
+struct CameraEnvironment;
+struct SceneInteractionEnvironment;
+struct SelectionEnvironment;
+
+/** @defgroup OccSceneInteractionService OpenCASCADE scene interaction service module
+ * @brief OpenCASCADE scene interaction service module
+ * @details This module provides flexible interfaces for solving the problem of accepting user input in UI thread and
+ * processing it in Render thread. Typical use case is when we have a UI framework (QT) that has a dedicated thread for
+ * rendering.
+ *
+ * Prerequisite knowledge:
+ *
+ * 1. It is built on top of AIS_ViewController class. For more information, see the link below.
+ *
+ * 2. Also, to understand what problem we are solving here, one should be aware of QML Threaded Render Loop (also see link
+ * below.)
+ *
+ * For each method of each class in this module there should be a clear distinction where (or when) it should be called.
+ * Possible options are: UI thread, Render thread, sync time between GUI and Render threads or any thread. The general
+ * rule is:
+ *
+ * 1. Accumulate all user input UI thread
+ *
+ * 2. Pass accumulated input to render thread data structure at sync time
+ *
+ * 3. Process passed input in render thread by changing the graphics scene and/or view
+ *
+ * Generally, one should try to minimize operations at sync time as it blocks the UI thread and can cause performance
+ * issues. That's why we have 3 stages instead of just 2 when we process passed input at sync time, as processing input
+ * is much more expensive operation then passing the UI input to render data structures.
+ *
+ * To abstract the user of this module from implementation details of internal data synchronization and input processing
+ * we provide a series of interfaces for interaction with the scene. The interfaces are:
+ *
+ * 1. ICameraListener - Helps when user wants to do an action on any camera event.
+ *
+ * 2. IKeyHandler - Handles key events in Render thread.
+ *
+ * 3. IMouseClickHandler - Adds additional action on mouse clicks.
+ *
+ * 4. IMouseHoverListener - Adds additional actions on mouse hover (mouse move without any buttons pressed).
+ *
+ * 5. IOwnerHoverListener - Adds additional actions when owner starts/stops being hovered.
+ *
+ * 6. ISelectionHandler - Provides opportunity to handle selection differently from default behavior.
+ *
+ * 7. CustomAction - Allows user to add additional custom actions on specific Mouse + Modifier combinations.
+ *
+ * The main class of this module is ViewController. It provides all necessary API for accumulating input in UI thread,
+ * synchronizing UI and Render data, and process input in Render thread. It also provides API for setting all necessary
+ * additional handlers/listeners mentioned above.
+ *
+ * @see
+ * [Small AIS_ViewController article](https://unlimited3d.wordpress.com/2019/11/06/ais_viewcontroller-in-occt-7-4-0/)
+ *
+ * [QML Threaded Render Loop](https://doc.qt.io/qt-6/qtquick-visualcanvas-scenegraph.html#threaded-render-loop-threaded)
+ */
+
+/** @ingroup UserInteractionService
+ * @brief This class is responsible for:
+ * 1. Accumulating user input (mouse clicks, mouse movements, etc.) on UI side in GUI thread;
+ * 2. Passing user input from UI to Render at sync between GUI and Render thread;
+ * 3. Handling user input in Render thread.
+ *
+ * If one wants to modify the default behavior, they can set custom SceneInteractionEnvironment.
+ */
 class ViewController : public AIS_ViewController
 {
   public: //! @name public methods
     OSIS_API ViewController() = default;
+
+    /**
+     * @brief Sets scene interaction environment which consists of camera environment, selection environment and custom
+     * actions. Is called from UI thread.
+     * @param sceneInteractionEnvironment Scene interaction environment.
+     */
+    void setSceneInteractionEnvironment(const SceneInteractionEnvironment &sceneInteractionEnvironment);
+
+    /**
+     * @brief Sets camera environment for the graphics scene. Is called from UI thread.
+     * @param cameraEnvironment Camera environment.
+     */
+    void setCameraEnvironment(const CameraEnvironment &cameraEnvironment);
+
+    /**
+     * @brief Sets selection environment for the graphics scene. Is called from UI thread.
+     * @param selectionEnvironment Selection environment.
+     */
+    void setSelectionEnvironment(const SelectionEnvironment &selectionEnvironment);
 
     /**
      * @brief Sets custom actions for the graphics scene. Is called from UI thread.
@@ -64,6 +152,12 @@ class ViewController : public AIS_ViewController
      */
     void setKeyHandler(Handle(IKeyHandler) pKeyHandler);
 
+    /**
+     * @brief Sets selection filter. Can be NULL, if no selection filter needed. Is called from UI thread.
+     * @param pSelectionFilter Selection filter.
+     */
+    void setSelectionFilter(Handle(SelectMgr_Filter) pSelectionFilter);
+
   public: //! @name public overridden methods
     /**
      * @brief Overridden method of HandleViewEvents. Is called from Render thread.
@@ -97,6 +191,55 @@ class ViewController : public AIS_ViewController
      */
     bool UpdateMousePosition(const Graphic3d_Vec2i &point, Aspect_VKeyMouse buttons, Aspect_VKeyFlags modifiers,
                              bool isEmulated) override;
+
+    
+    /**
+     * @brief Returns camera listener. Is called from Render thread.
+     * @return Camera listener.
+     */
+    Handle(ICameraListener) getCameraListener() const { return m_pCameraListenerSyncObject.getRenderData(); }
+
+    /**
+     * @brief Returns owner hover listener. Is called from Render thread.
+     * @return Owner hover listener.
+     */
+    Handle(IOwnerHoverListener) getOwnerHoverListener() const;
+
+    /**
+     * @brief Returns custom actions of the graphics scene. Is called from Render thread.
+     * @return Custom actions of the graphics scene.
+     */
+    const std::vector<Handle(CustomMouseAction)> &getCustomActions() const;
+
+    /**
+     * @brief Returns key handler. Is called from Render thread.
+     * @return Key handler.
+     */
+    Handle(IKeyHandler) getKeyHandler() const;
+
+    /**
+     * @brief Returns mouse click handler. Is called from Render thread.
+     * @return Mouse click handler.
+     */
+    Handle(IMouseClickHandler) getMouseClickHandler() const;
+
+    /**
+     * @brief Returns mouse hover listener. Is called from Render thread.
+     * @return Mouse hover listener.
+     */
+    Handle(IMouseHoverListener) getMouseHoverListener() const;
+
+    /**
+     * @brief Sets if rubber band selection is allowed. Is called from UI thread.
+     * @param toAllow if true, rubber band selection is allowed.
+     */
+    void setAllowRubberBandSelection(bool toAllow);
+
+    /**
+     * @brief Returns if rubber band selection is allowed. Is called from UI thread.
+     * @return true if rubber band selection is allowed.
+     */
+    bool toAllowRubberBandSelection() const;
 
   protected: //! @name protected overridden methods
     /**
@@ -155,6 +298,8 @@ class ViewController : public AIS_ViewController
     };
 
   private:
+    std::unordered_set<unsigned> m_rubberBandModifiers;
+
     UiRenderSyncObject<Handle(ICameraListener)> m_pCameraListenerSyncObject;
     bool m_isAnimationInProgress = false;
 
@@ -171,6 +316,8 @@ class ViewController : public AIS_ViewController
 
     UiRenderSyncObject<std::vector<Handle(CustomMouseAction)>> m_customMouseActionsSyncObject;
     std::map<unsigned int, Handle(CustomMouseAction)> m_customActionValues;
+
+    UiRenderSyncObject<Handle(SelectMgr_Filter)> m_pSelectionFilterSyncObject;
 };
 
 } // namespace osis

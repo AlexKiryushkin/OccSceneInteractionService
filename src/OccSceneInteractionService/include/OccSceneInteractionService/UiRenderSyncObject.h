@@ -7,7 +7,7 @@
 namespace osis
 {
 
-/**
+/** @ingroup UserInteractionService
  * @brief This is a general class for data should be shared between ui and render threads and should always be in sync.
  * This class provides methods to set the value in UI thread and sync this value in synchronization time when UI and
  * Render threads are synced.
