@@ -9,7 +9,7 @@
 namespace osis
 {
 
-/**
+/** @ingroup UserInteractionService
  * @brief An interface to perform some actions in render thread on key pressing and releasing. AIS_ViewController has
  * callbacks for these events but only in UI thread. This class allows to perform actions in Render thread.
  */

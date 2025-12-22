@@ -9,7 +9,7 @@
 namespace osis
 {
 
-/**
+/** @ingroup UserInteractionService
  * @brief Performs custom logic in graphics scene for given user input
  */
 class IInputHandler : public Standard_Transient

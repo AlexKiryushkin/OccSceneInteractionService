@@ -33,6 +33,7 @@ target_sources(${LIBRARY_NAME}
               ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/IMouseHoverListener.h
               ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/IOwnerHoverListener.h
               ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/KeyboardListener.h
+              ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/SceneInteractionEnvironment.h
               ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/UiRenderSyncObject.h
               ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/UserActionInput.h
               ${CMAKE_CURRENT_LIST_DIR}/include/OccSceneInteractionService/UserActionInputData.h
@@ -76,12 +77,21 @@ target_link_libraries(
 # -------------------------------------------------------------------------------------------------
 # Include Paths
 # -------------------------------------------------------------------------------------------------
-target_include_directories(${PROJECT_NAME}
+target_include_directories(${LIBRARY_NAME}
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
     PUBLIC
         ${OpenCASCADE_INCLUDE_DIR}
+)
+
+
+# -------------------------------------------------------------------------------------------------
+# Compile definitions
+# -------------------------------------------------------------------------------------------------
+target_compile_definitions(
+    ${LIBRARY_NAME} PRIVATE
+        OCCT_HANDLE_NOCAST
 )
 
 

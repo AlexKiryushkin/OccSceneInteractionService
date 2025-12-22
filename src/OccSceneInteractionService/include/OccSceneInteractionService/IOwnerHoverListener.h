@@ -10,7 +10,7 @@
 namespace osis
 {
 
-/**
+/** @ingroup UserInteractionService
  * @brief An interface that allow to perform additional actions when an owner starts/stops to be hovered (dynamically
  * highlighted).
  */

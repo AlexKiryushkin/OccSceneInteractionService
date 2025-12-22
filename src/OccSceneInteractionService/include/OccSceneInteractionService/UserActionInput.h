@@ -11,7 +11,7 @@
 namespace osis
 {
 
-/**
+/** @ingroup UserInteractionService
  * @brief This class is responsible for gathering user action input in GUI thread and copying it to render thread
  * without data races.
  */
