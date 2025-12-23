@@ -35,24 +35,24 @@ class TestViewControllerSceneInteractionEnvironment : public TestViewControllerB
 
     static Handle(CustomMouseAction) makeCustomAction(unsigned int mouseCombination)
     {
-        return new MockCustomMouseAction(UserActionInput{UserActionInput::ApplyOn::Stop, 3},
-                                         std::vector{mouseCombination},
-                                         Handle(StrictMock<MockInputHandler>){new StrictMock<MockInputHandler>()});
+        return {new MockCustomMouseAction(UserActionInput{UserActionInput::ApplyOn::Stop, 3},
+                                          std::vector{mouseCombination},
+                                          Handle(StrictMock<MockInputHandler>){new StrictMock<MockInputHandler>()})};
     }
 
     static Handle(IKeyHandler) makeKeyHandler()
     {
-        return Handle(StrictMock<MockKeyHandler>){new StrictMock<MockKeyHandler>()};
+        return {new StrictMock<MockKeyHandler>()};
     }
 
     static Handle(IMouseClickHandler) makeMouseClickHandler()
     {
-        return Handle(StrictMock<MockMouseClickHandler>){new StrictMock<MockMouseClickHandler>()};
+        return {new StrictMock<MockMouseClickHandler>()};
     }
 
     static Handle(IMouseHoverListener) makeMouseHoverListener()
     {
-        return Handle(StrictMock<MockMouseHoverListener>){new StrictMock<MockMouseHoverListener>()};
+        return {new StrictMock<MockMouseHoverListener>()};
     }
 
     static std::vector<Handle(CustomMouseAction)> makeCustomActions(std::size_t actionsCount)
@@ -186,7 +186,7 @@ TEST_F(TestViewControllerSceneInteractionEnvironment, setCustomActions)
         EXPECT_EQ(getViewController().getCustomActions(), oldCustomActions);
         EXPECT_EQ(getViewController().MouseGestureMap().Size(), oldGesturesCount);
 
-        ::testing::InSequence s;
+        ::testing::InSequence seq;
         for(auto &&pOldCustomAction : oldCustomActions)
         {
             EXPECT_CALL(dynamic_cast<MockCustomMouseAction &>(*pOldCustomAction), tearDown());
@@ -247,7 +247,7 @@ TEST_F(TestViewControllerSceneInteractionEnvironment, setSceneInteractionEnviron
         EXPECT_EQ(getViewController().getMouseHoverListener(), pOldMouseHoverListener);
         EXPECT_EQ(getViewController().getCustomActions(), oldCustomActions);
 
-        ::testing::InSequence s;
+        ::testing::InSequence seq;
         for(auto &&pOldCustomAction : oldCustomActions)
         {
             EXPECT_CALL(dynamic_cast<MockCustomMouseAction &>(*pOldCustomAction), tearDown());
