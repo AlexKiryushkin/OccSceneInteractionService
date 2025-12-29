@@ -1,5 +1,4 @@
 # -------------------------------------------------------------------------------------------------
-# Add Libraries
+# Adding subdirectories with tests
 # -------------------------------------------------------------------------------------------------
-add_subdirectory(OccSceneInteractionService)
-add_subdirectory(QmlOsis)
+add_subdirectory(SimpleQmlOsisScene)

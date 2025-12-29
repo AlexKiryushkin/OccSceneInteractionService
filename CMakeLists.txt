@@ -25,6 +25,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Build options
 # -------------------------------------------------------------------------------------------------
 set(OSIS_BUILD_TESTS OFF CACHE BOOL "Build tests")
+set(OSIS_BUILD_SAMPLES OFF CACHE BOOL "Build samples")
 
 
 # -------------------------------------------------------------------------------------------------
@@ -44,6 +45,9 @@ if (OSIS_BUILD_TESTS)
 	add_subdirectory(test)
 endif()
 
+if (OSIS_BUILD_SAMPLES)
+	add_subdirectory(samples)
+endif()
 
 # -------------------------------------------------------------------------------------------------
 # Package Library
